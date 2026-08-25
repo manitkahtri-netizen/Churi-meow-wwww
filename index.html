@@ -1,0 +1,1289 @@
+<title>Meridian Watch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+/* ─────────────────────────────────────────────────────────────
+   Meridian Watch — tokens
+   Light palette on bare :root; dark redefines tokens only.
+   ───────────────────────────────────────────────────────────── */
+:root{
+  --ground:#EFEAE0;
+  --ground-2:#E5DED0;
+  --panel:rgba(252,249,243,.86);
+  --panel-solid:#FBF8F1;
+  --edge:rgba(30,26,18,.14);
+  --edge-soft:rgba(30,26,18,.07);
+  --ink:#161A21;
+  --ink-2:#4A5260;
+  --ink-3:#7C8494;
+  --brass:#A4630C;
+  --brass-lit:#C4841F;
+  --shadow:0 18px 44px -22px rgba(28,22,10,.45);
+
+  /* globe uniforms (read by the renderer) */
+  --g-ocean-deep:#1E4260;
+  --g-ocean-shoal:#3A6C8B;
+  --g-land:#F0DFB4;
+  --g-land-edge:#9C8047;
+  --g-grid:#7FA3B8;
+  --g-key:#C3B090;
+  --g-amb-top:#A79B87;
+  --g-amb-bot:#5C5C5B;
+  --g-rim:#5E86AB;
+  --g-halo:#7FA9D4;
+  --g-mark:#A96A0C;
+  --g-mark-hot:#4A2701;
+  --g-mark-key:#FCF6E8;
+  --halo-strength:.07;
+  --seat-alpha:.15;
+  --seat-color:#6A5A3C;
+  --g-spec:.18;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#080C13;
+    --ground-2:#04070C;
+    --panel:rgba(15,22,34,.72);
+    --panel-solid:#0F1622;
+    --edge:rgba(190,206,230,.14);
+    --edge-soft:rgba(190,206,230,.07);
+    --ink:#E6E2D8;
+    --ink-2:#A0A9B8;
+    --ink-3:#6C7688;
+    --brass:#E9A73C;
+    --brass-lit:#FFCC7A;
+    --shadow:0 24px 60px -28px rgba(0,0,0,.9);
+
+    --g-ocean-deep:#08192A;
+    --g-ocean-shoal:#123650;
+    --g-land:#C3AD86;
+    --g-land-edge:#6E5E44;
+    --g-grid:#4E7793;
+    --g-key:#F6E3C4;
+    --g-amb-top:#2C4257;
+    --g-amb-bot:#0E1826;
+    --g-rim:#4E85B6;
+    --g-halo:#6FA8DE;
+    --g-mark:#F0AE45;
+    --g-mark-hot:#FFF6E4;
+    --g-mark-key:#93571A;
+    --halo-strength:1;
+    --seat-alpha:0;
+    --seat-color:#000000;
+    --g-spec:.5;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#080C13;
+  --ground-2:#04070C;
+  --panel:rgba(15,22,34,.72);
+  --panel-solid:#0F1622;
+  --edge:rgba(190,206,230,.14);
+  --edge-soft:rgba(190,206,230,.07);
+  --ink:#E6E2D8;
+  --ink-2:#A0A9B8;
+  --ink-3:#6C7688;
+  --brass:#E9A73C;
+  --brass-lit:#FFCC7A;
+  --shadow:0 24px 60px -28px rgba(0,0,0,.9);
+
+  --g-ocean-deep:#08192A;
+  --g-ocean-shoal:#123650;
+  --g-land:#C3AD86;
+  --g-land-edge:#6E5E44;
+  --g-grid:#4E7793;
+  --g-key:#F6E3C4;
+  --g-amb-top:#2C4257;
+  --g-amb-bot:#0E1826;
+  --g-rim:#4E85B6;
+  --g-halo:#6FA8DE;
+  --g-mark:#F0AE45;
+  --g-mark-hot:#FFF6E4;
+  --g-mark-key:#93571A;
+  --halo-strength:1;
+  --seat-alpha:0;
+  --seat-color:#000000;
+  --g-spec:.5;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:"IBM Plex Sans","Segoe UI",Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+.mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+
+/* ── stage ───────────────────────────────────────────────── */
+.stage{position:fixed;inset:0;overflow:hidden;background:
+  radial-gradient(120% 90% at 62% 46%, var(--ground) 0%, var(--ground-2) 78%);}
+#gl,#ui{position:absolute;inset:0;width:100%;height:100%;display:block}
+#gl{touch-action:none;cursor:grab}
+#gl.dragging{cursor:grabbing}
+#gl.overmark{cursor:pointer}
+#ui{pointer-events:none}
+.vignette{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(115% 85% at 60% 44%, transparent 42%, color-mix(in srgb, var(--ground-2) 78%, transparent) 100%);}
+
+/* ── masthead ────────────────────────────────────────────── */
+.left{position:absolute;left:0;top:0;bottom:0;z-index:4;width:356px;
+  padding:26px 30px 78px;display:flex;flex-direction:column;gap:22px;pointer-events:none}
+.mast{flex:none;pointer-events:none}
+.mark{display:flex;align-items:center;gap:10px;margin:0 0 9px}
+.mark svg{width:19px;height:19px;color:var(--brass);flex:none}
+.mark span{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.26em;
+  text-transform:uppercase;color:var(--ink-3)}
+.mast h1{
+  font-family:Fraunces,"Iowan Old Style","Palatino Linotype",Georgia,serif;
+  font-variation-settings:"opsz" 120;
+  font-weight:500;font-size:clamp(28px,4.1vw,46px);line-height:.98;
+  letter-spacing:-.018em;margin:0;text-wrap:balance;color:var(--ink);
+}
+.mast h1 em{font-style:italic;font-weight:400;color:var(--brass)}
+.mast p{margin:11px 0 0;font-size:13.5px;line-height:1.55;color:var(--ink-2);max-width:34ch}
+
+/* ── station rail ────────────────────────────────────────── */
+.rail{flex:1;min-height:0;display:flex;flex-direction:column;pointer-events:auto}
+.rail-head{display:flex;align-items:baseline;justify-content:space-between;
+  padding:0 4px 9px;border-bottom:1px solid var(--edge);margin-bottom:2px}
+.rail-head b{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:10px;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--ink-2)}
+.rail-head i{font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:9.5px;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+.rail-list{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;
+  scrollbar-color:var(--edge) transparent;
+  -webkit-mask-image:linear-gradient(to bottom,transparent,#000 12px,#000 calc(100% - 12px),transparent);
+          mask-image:linear-gradient(to bottom,transparent,#000 12px,#000 calc(100% - 12px),transparent);}
+.rail-list::-webkit-scrollbar{width:4px}
+.rail-list::-webkit-scrollbar-thumb{background:var(--edge);border-radius:2px}
+
+.loc{
+  position:relative;display:flex;align-items:center;gap:12px;width:100%;
+  padding:10px 10px 10px 15px;border:0;background:transparent;
+  text-align:left;cursor:pointer;color:inherit;font:inherit;
+  border-bottom:1px solid var(--edge-soft);
+  transition:background .22s ease, padding-left .22s ease;
+}
+.loc::before{
+  content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:2px;height:0;background:var(--brass);border-radius:1px;
+  transition:height .3s cubic-bezier(.2,.8,.2,1), opacity .3s ease;opacity:0;
+}
+.loc:hover{background:color-mix(in srgb, var(--ink) 5%, transparent)}
+.loc:focus-visible{outline:2px solid var(--brass);outline-offset:-2px;border-radius:3px}
+.loc.is-meridian::before{height:44%;opacity:.5}
+.loc.is-active{background:color-mix(in srgb, var(--brass) 11%, transparent);padding-left:19px}
+.loc.is-active::before{height:74%;opacity:1;width:2.5px;
+  box-shadow:0 0 12px color-mix(in srgb, var(--brass) 70%, transparent)}
+
+.loc-body{flex:1;min-width:0}
+.loc-name{
+  display:block;font-family:Fraunces,"Iowan Old Style",Georgia,serif;
+  font-variation-settings:"opsz" 40;font-weight:500;font-size:16px;line-height:1.22;
+  letter-spacing:-.006em;color:var(--ink);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.loc.is-active .loc-name{color:var(--brass-lit)}
+.loc-region{display:block;margin-top:2px;font-size:11.5px;color:var(--ink-3);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.loc-lon{flex:none;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;
+  font-size:11px;color:var(--ink-3);letter-spacing:-.01em}
+.loc.is-active .loc-lon,.loc.is-meridian .loc-lon{color:var(--ink-2)}
+
+/* ── dossier ─────────────────────────────────────────────── */
+.dossier{
+  position:absolute;right:30px;bottom:88px;z-index:5;width:340px;
+  background:var(--panel);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--edge);border-radius:4px;box-shadow:var(--shadow);
+  padding:20px 22px 18px;
+  opacity:0;transform:translateY(14px) scale(.985);pointer-events:none;
+  transition:opacity .42s cubic-bezier(.2,.8,.2,1), transform .42s cubic-bezier(.2,.8,.2,1);
+}
+.dossier.is-open{opacity:1;transform:none;pointer-events:auto}
+.dossier-eyebrow{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.dossier-eyebrow s{text-decoration:none;width:16px;height:1px;background:var(--brass);flex:none}
+.dossier-eyebrow span{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--brass)}
+.dossier h2{
+  font-family:Fraunces,"Iowan Old Style",Georgia,serif;font-variation-settings:"opsz" 88;
+  font-weight:500;font-size:25px;line-height:1.08;letter-spacing:-.016em;margin:0;
+  text-wrap:balance;color:var(--ink);
+}
+.dossier .where{margin:5px 0 0;font-size:12.5px;color:var(--ink-2)}
+.dossier .note{margin:13px 0 0;font-size:13px;line-height:1.62;color:var(--ink-2)}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:11px 14px;margin-top:16px;
+  padding-top:15px;border-top:1px solid var(--edge)}
+.fact{min-width:0}
+.fact dt{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink-3);margin:0 0 3px}
+.fact dd{margin:0;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;
+  font-size:12.5px;color:var(--ink)}
+.fact.wide{grid-column:1/-1}
+.fact.wide dd{font-family:"IBM Plex Sans",sans-serif;font-size:12.5px;color:var(--ink-2)}
+.release{
+  margin-top:17px;width:100%;padding:9px;border:1px solid var(--edge);border-radius:3px;
+  background:transparent;color:var(--ink-2);cursor:pointer;
+  font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  transition:border-color .2s ease,color .2s ease,background .2s ease;
+}
+.release:hover{border-color:var(--brass);color:var(--brass);
+  background:color-mix(in srgb, var(--brass) 8%, transparent)}
+.release:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+
+/* ── instrument strip ────────────────────────────────────── */
+.strip{
+  position:absolute;left:0;right:0;bottom:0;z-index:4;
+  display:flex;align-items:center;gap:22px;flex-wrap:wrap;
+  padding:16px 30px 20px;
+  font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3);
+}
+.rotor{display:flex;align-items:center;gap:8px;border:0;background:transparent;
+  color:var(--ink-2);font:inherit;letter-spacing:.14em;text-transform:uppercase;
+  cursor:pointer;padding:5px 11px 5px 9px;border-radius:99px;
+  border:1px solid var(--edge);transition:border-color .2s,color .2s}
+.rotor:hover{border-color:var(--brass);color:var(--brass)}
+.rotor:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.pip{width:6px;height:6px;border-radius:50%;background:var(--brass);flex:none;
+  box-shadow:0 0 0 0 color-mix(in srgb, var(--brass) 55%, transparent)}
+.rotor.spinning .pip{animation:pulse 2.1s ease-out infinite}
+.rotor:not(.spinning) .pip{background:var(--ink-3);opacity:.55}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 color-mix(in srgb, var(--brass) 55%, transparent)}
+  70%{box-shadow:0 0 0 7px transparent}
+  100%{box-shadow:0 0 0 0 transparent}
+}
+.bearing{color:var(--ink-2);font-variant-numeric:tabular-nums}
+.bearing b{font-weight:400;color:var(--ink-3);letter-spacing:.18em;margin-right:7px}
+.hint{margin-left:auto;color:var(--ink-3);opacity:.85}
+.hint kbd{font:inherit;border:1px solid var(--edge);border-radius:3px;padding:1px 5px;
+  color:var(--ink-2)}
+
+/* ── fallback ────────────────────────────────────────────── */
+.nogl{position:absolute;inset:0;display:none;place-items:center;padding:40px;text-align:center;z-index:6}
+.nogl p{max-width:38ch;font-size:14px;line-height:1.6;color:var(--ink-2)}
+.stage.failed .nogl{display:grid}
+.stage.failed #gl,.stage.failed #ui{opacity:0}
+
+/* ── responsive ──────────────────────────────────────────── */
+@media (max-width:1100px){
+  .left{width:300px;padding:22px 22px 74px}
+  .dossier{width:300px;right:22px}
+}
+@media (max-width:900px){
+  .left{position:absolute;inset:0;width:auto;padding:0;display:block}
+  .mast{position:absolute;top:0;left:0;padding:16px 18px;max-width:56%}
+  .mast h1{font-size:25px}
+  .mast p{display:none}
+  .rail{
+    position:absolute;left:0;right:0;bottom:0;top:auto;width:auto;
+    background:linear-gradient(to top,var(--ground) 62%,transparent);
+    padding:26px 0 14px;
+  }
+  .rail-head{padding:0 20px 8px;margin:0 0 6px}
+  .rail-list{display:flex;overflow-x:auto;overflow-y:hidden;gap:0;padding:0 14px;
+    scroll-snap-type:x proximity;
+    -webkit-mask-image:linear-gradient(to right,transparent,#000 16px,#000 calc(100% - 16px),transparent);
+            mask-image:linear-gradient(to right,transparent,#000 16px,#000 calc(100% - 16px),transparent);}
+  .loc{flex:none;width:186px;flex-direction:column;align-items:flex-start;gap:1px;overflow:hidden;
+    border-bottom:0;border-right:1px solid var(--edge-soft);padding:8px 15px;scroll-snap-align:center}
+  .loc-body{width:100%;max-width:100%}
+  .loc::before{left:50%;top:auto;bottom:0;transform:translateX(-50%);width:0;height:2px}
+  .loc.is-meridian::before{width:34%;height:2px;opacity:.5}
+  .loc.is-active{padding-left:15px}
+  .loc.is-active::before{width:64%;height:2px;opacity:1}
+  .loc-lon{margin-top:3px}
+  .dossier{right:14px;left:14px;width:auto;bottom:132px;padding:16px 18px 15px}
+  .facts{margin-top:13px;padding-top:12px;gap:9px 12px}
+  .strip{bottom:auto;top:0;left:auto;width:auto;justify-content:flex-end;
+    padding:16px 16px 0;gap:10px;font-size:9.5px}
+  .strip .hint,.strip .bearing{display:none}
+  .rotor{padding:4px 10px 4px 8px}
+}
+@media (max-width:520px){
+  .dossier .note{display:none}
+  .dossier{bottom:126px}
+  .mast .mark{display:none}
+  .mast{padding-top:18px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;animation-iteration-count:1 !important;
+    transition-duration:.06s !important}
+}
+</style>
+
+<div class="stage" id="stage">
+  <canvas id="gl" aria-label="Interactive 3D globe showing ten ground stations and observatories. Drag to spin; the list of stations beside it offers the same navigation." role="img"></canvas>
+  <canvas id="ui"></canvas>
+  <div class="vignette"></div>
+
+  <div class="nogl"><p>This globe needs WebGL, which this browser has turned off. The station list below still works as a directory.</p></div>
+
+  <div class="left">
+  <header class="mast">
+    <p class="mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true">
+        <circle cx="12" cy="12" r="9.2"/><ellipse cx="12" cy="12" rx="4" ry="9.2"/>
+        <path d="M2.8 12h18.4M4.4 6.9h15.2M4.4 17.1h15.2"/>
+      </svg>
+      <span>Ten sites · one sphere</span>
+    </p>
+    <h1>Meridian <em>Watch</em></h1>
+    <p>A slow turn past the observatories and ground stations that keep an ear on the sky. Drag the sphere, or pick a station to bring it under the meridian.</p>
+  </header>
+
+  <nav class="rail" aria-label="Featured stations">
+    <div class="rail-head"><b>Featured stations</b><i>West → East</i></div>
+    <div class="rail-list" id="railList"></div>
+  </nav>
+  </div>
+
+  <section class="dossier" id="dossier" aria-live="polite">
+    <p class="dossier-eyebrow"><s></s><span id="dEyebrow"></span></p>
+    <h2 id="dName"></h2>
+    <p class="where" id="dWhere"></p>
+    <p class="note" id="dNote"></p>
+    <dl class="facts">
+      <div class="fact"><dt>Latitude</dt><dd id="dLat"></dd></div>
+      <div class="fact"><dt>Longitude</dt><dd id="dLon"></dd></div>
+      <div class="fact wide"><dt>Operator</dt><dd id="dOp"></dd></div>
+    </dl>
+    <button class="release" id="release">Release · resume rotation</button>
+  </section>
+
+  <footer class="strip">
+    <button class="rotor spinning" id="rotor" aria-pressed="true">
+      <span class="pip"></span><span id="rotorLabel">Auto-rotate engaged</span>
+    </button>
+    <span class="bearing mono"><b>Under meridian</b><span id="bearing">0.0° N &nbsp;0.0° E</span></span>
+    <span class="hint">Drag to spin · click a marker · <kbd>Esc</kbd> to release</span>
+  </footer>
+</div>
+
+<script>
+"use strict";
+/* ═══════════════════════════════════════════════════════════════════
+   MERIDIAN WATCH
+   Hand-rolled WebGL globe. No libraries — the artifact CSP blocks CDNs,
+   so geometry, shaders, the equirectangular land texture and the camera
+   are all built here.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Featured stations, ordered west → east by longitude ───────────
+   Sorting by longitude means the highlighted row advances down the
+   rail in step with the auto-rotation: the list reads as a meridian
+   log rather than an arbitrary menu.                                */
+const STATIONS = [
+  { name:"Mauna Kea Observatories", region:"Hawaiʻi, United States", lat:19.8207, lon:-155.4681,
+    kind:"Optical / infrared", op:"Keck Observatory, NAOJ, NOIRLab and others",
+    note:"Thirteen telescopes share a summit at roughly 4,200 m, above 40% of the atmosphere and almost all of its water vapour — which is what makes the infrared sky legible from here." },
+  { name:"Goldstone Deep Space Complex", region:"Mojave Desert, California", lat:35.4267, lon:-116.8900,
+    kind:"Deep Space Network", op:"NASA JPL",
+    note:"DSS-14, the 70-metre “Mars antenna”, anchors the western third of the Deep Space Network. Three complexes 120° apart keep every outbound spacecraft in contact around the clock." },
+  { name:"Paranal Observatory", region:"Atacama Desert, Chile", lat:-24.6275, lon:-70.4044,
+    kind:"Optical / infrared", op:"European Southern Observatory",
+    note:"Four 8.2-metre Unit Telescopes on a 2,635 m ridge, in one of the driest places on Earth. Combined interferometrically, they resolve detail no single mirror could." },
+  { name:"Guiana Space Centre", region:"Kourou, French Guiana", lat:5.2360, lon:-52.7683,
+    kind:"Launch site", op:"CNES and the European Space Agency",
+    note:"Five degrees off the equator, so Earth’s spin donates the most it can to an eastward launch — and the range points out over open Atlantic." },
+  { name:"Jodrell Bank Observatory", region:"Cheshire, United Kingdom", lat:53.2367, lon:-2.3075,
+    kind:"Radio astronomy", op:"University of Manchester",
+    note:"The 76-metre Lovell Telescope has been steerable since 1957, when it tracked the carrier rocket of Sputnik 1. The site became a UNESCO World Heritage Site in 2019." },
+  { name:"Svalbard Satellite Station", region:"Spitsbergen, Norway", lat:78.2297, lon:15.3975,
+    kind:"Ground station", op:"Kongsberg Satellite Services",
+    note:"At 78° north it sits under every pass of a polar-orbiting satellite — all fourteen a day — which no lower-latitude station can claim." },
+  { name:"MeerKAT", region:"Karoo, South Africa", lat:-30.7217, lon:21.4111,
+    kind:"Radio array", op:"South African Radio Astronomy Observatory",
+    note:"Sixty-four dishes spread across a legally protected radio-quiet reserve, now folding into the Square Kilometre Array as its first working core." },
+  { name:"FAST", region:"Guizhou, China", lat:25.6528, lon:106.8556,
+    kind:"Radio astronomy", op:"National Astronomical Observatories, CAS",
+    note:"A 500-metre reflector set into a natural karst depression. Its surface is actively deformed to form a 300-metre parabola aimed wherever the observation needs it." },
+  { name:"Concordia Station", region:"Dome C, Antarctica", lat:-75.1000, lon:123.3333,
+    kind:"Polar research", op:"IPEV and PNRA",
+    note:"On the Antarctic plateau at about 3,230 m, with winter temperatures near −80 °C and a four-month night. The air is so still and dry that seeing rivals low orbit." },
+  { name:"Canberra Deep Space Complex", region:"Tidbinbilla, Australia", lat:-35.4014, lon:148.9817,
+    kind:"Deep Space Network", op:"NASA DSN, operated by CSIRO",
+    note:"DSS-43 is the largest steerable dish in the southern hemisphere, and for years the only antenna on Earth able to send commands to Voyager 2." },
+];
+
+/* ── Coarse coastlines, [lon, lat] rings. Deliberately generalised:
+   the globe is a chart, not a survey.                               */
+const LAND = [
+/* Africa */[[-9.8,30],[-16,21],[-17.5,14.7],[-13.5,9.5],[-7.5,4.4],[1,5.8],[5.5,4.3],[9.5,4],[9.3,-.5],[11.8,-5],[13,-12.5],[14.5,-22.5],[17.5,-28.5],[18.5,-34.4],[25,-34],[31,-29.8],[35.5,-23.5],[40.5,-16],[40,-10.5],[39.5,-6.8],[41.5,-2],[43.5,4],[51.4,11.8],[48,12.5],[43.5,12.7],[39,15],[37,21],[34.5,28],[32.5,31.3],[25,31.5],[19,30.4],[15,32.5],[10.5,37.2],[3,36.8],[-2,35.3],[-5.9,35.8],[-9.3,32.6]],
+/* Eurasia */[[-9.5,38.7],[-9,43.2],[-4,48.3],[0,49.5],[3,51.5],[8,53.5],[8.5,57.5],[5.3,60.4],[10,64],[14.5,68],[20,70],[28,71],[33,68],[40,66],[44.5,68],[55,68.5],[60,70],[73,71],[80,73],[100,77.5],[112,73.5],[130,72.5],[140,72],[160,69.5],[172,68.8],[179.4,65.5],[179,62],[170,60.5],[163,61],[163.5,58],[158.5,52.5],[155.5,55],[153,59],[148,59.5],[142,54],[140.5,48],[135,43.5],[129,40],[129.5,35.1],[126.5,34.5],[125.5,39.5],[122,40.5],[119,39],[121.5,37.5],[119.5,34.5],[121.8,31.2],[120,27],[117,23.5],[113.5,22],[110,20.5],[108.5,21.5],[106.5,18.5],[109,13.5],[107,10.5],[104,10],[100.5,13.5],[99,9.5],[100.5,6],[103.5,1.4],[100.3,5.5],[98.5,8],[97.5,16.5],[94.5,18],[90.5,22.5],[87,21.5],[84,19],[80.3,13.1],[79.9,9.2],[77,8.1],[75.5,13],[72.8,19.1],[69,22.5],[66.5,25],[60,25.2],[57,22.8],[54.5,17],[52.5,15.5],[45,12.8],[43.3,12.6],[42.5,16.5],[39,21.5],[36.5,28],[34.8,29.5],[34.9,31.5],[35.5,36],[36,36.5],[33,36.5],[31,36.8],[28,36.7],[26.5,38.5],[29,41],[35,42],[41.5,41.5],[39.5,43.5],[37.5,45],[34,45.4],[31,46.5],[28.8,45],[28,43.5],[27.5,42],[26.5,40.5],[23.5,40],[23,37],[21.5,37.5],[20,39.5],[19.5,42],[16.5,43.2],[13.5,45.6],[12.5,44.5],[16,41.9],[18.4,40],[16.5,38.9],[15.6,38],[14,40.6],[11,42.4],[10,44],[8.8,44.4],[5.5,43.2],[3,42.5],[.5,40.5],[-.5,38.3],[-2.5,36.7],[-5.6,36],[-6.5,37.2],[-8.9,37]],
+/* North America */[[-166,66],[-161,70.5],[-156.5,71.4],[-140,69.8],[-128,70],[-115,68.5],[-105,68],[-95,68.5],[-90,68.5],[-85,66.5],[-87,64],[-92,63.5],[-94,59],[-92,56.5],[-88,55],[-83,55.5],[-80,52.5],[-79,58],[-77.5,62],[-72,62.5],[-69.5,60],[-64.5,60.3],[-64,58.5],[-61.5,56],[-57,54],[-56,51.5],[-60,47.5],[-64,46.5],[-66.5,44.5],[-70.5,43],[-74,40.5],[-75.5,37],[-76.5,34.5],[-81,31.5],[-80.1,25.8],[-82.5,27.5],[-84.5,30],[-89.5,29],[-94.5,29.5],[-97.5,26],[-95,18.5],[-92,18.5],[-90,21.5],[-87,21.5],[-88,17.5],[-83.5,15],[-82.5,9.5],[-79,9],[-77.5,7.5],[-79.5,8],[-83,10.5],[-86,12.5],[-90.5,14],[-95.5,16],[-99.5,17],[-105.5,20.5],[-109.5,23],[-112.5,27.5],[-114.5,30.5],[-117.2,32.5],[-120.5,34.5],[-122.5,37.8],[-124.2,41.5],[-124,46.5],[-125,50],[-131,55],[-136,58.5],[-145,60],[-150,59.5],[-153,57.5],[-158,56.5],[-162,58.5],[-165,60.5]],
+/* South America */[[-77.5,7.5],[-75.5,9.5],[-71.5,12],[-66.5,10.5],[-62,10.5],[-60,8.5],[-55,6],[-51,4],[-50,0],[-44,-2.5],[-38.5,-4],[-35,-6.5],[-37.5,-11],[-39,-16],[-40.5,-20.5],[-44,-23],[-48.5,-25.5],[-52.5,-31.5],[-56.5,-35],[-58.5,-38],[-62,-40],[-65,-43.5],[-67.5,-46],[-68.5,-50.5],[-69,-52.5],[-71.5,-54],[-74.5,-50],[-75.5,-47],[-73.5,-42],[-73.5,-37],[-71.5,-33],[-70.5,-25.5],[-70.5,-18.5],[-76.5,-14],[-79,-8],[-81.3,-6],[-80.5,-3.5],[-80,0],[-78,2.5]],
+/* Antarctica */[[-180,-78],[-170,-77],[-160,-77.5],[-150,-75],[-140,-74.5],[-130,-74],[-120,-73.5],[-110,-74],[-100,-74.5],[-90,-73.5],[-80,-72],[-70,-68],[-62,-65],[-58,-63.5],[-60,-70],[-70,-73],[-75,-75],[-60,-78],[-45,-78],[-30,-77],[-20,-75],[-10,-72],[0,-70],[10,-70],[20,-70.5],[30,-69],[40,-68],[50,-66.5],[60,-67],[70,-68.5],[80,-66.5],[90,-66.5],[100,-66],[110,-66.5],[120,-66.5],[130,-66],[140,-66.5],[150,-69],[160,-70.5],[165,-75],[170,-78],[180,-78],[180,-90],[-180,-90]],
+/* Greenland */[[-45,60],[-52,65],[-53.5,69],[-55,71.5],[-58,75.5],[-65,78.5],[-60,82],[-45,83.5],[-30,83],[-21,80],[-20,76],[-22,72.5],[-28,70],[-36,66],[-41,62.5]],
+/* Australia */[[129,-14.5],[132.5,-12],[136,-12],[135.5,-15],[140,-17.5],[142.5,-10.7],[145.5,-15],[149,-21],[153,-25.5],[153.5,-28.5],[151.5,-33],[150,-37.5],[146.5,-38.8],[140.5,-38],[137,-35.5],[135,-34.5],[134,-32.5],[129,-31.7],[124,-33.5],[118,-35],[115,-34],[114.9,-30],[113.5,-26],[114.5,-22],[118.5,-20.3],[122,-18],[125.5,-14]],
+/* Madagascar */[[43.3,-16],[44.5,-12.2],[48,-12.5],[49.9,-15.5],[50.5,-18.5],[48.5,-22],[47,-25],[45.2,-25.5],[43.5,-23.5],[43.3,-21]],
+/* Great Britain */[[-5,50],[-3,51.5],[.5,51.4],[1.7,52.8],[0,53.6],[-3,54],[-3,55],[-2,56.5],[-3,58.6],[-5,58.5],[-5.5,56.5],[-5,55],[-4.5,53.4],[-5.3,51.6]],
+/* Ireland */[[-6,52.2],[-6,53.4],[-6.3,54.4],[-8,55.3],[-10,54.3],[-10.2,53.4],[-9.5,52.2],[-8,51.5]],
+/* Japan */[[131,31],[132.5,33.5],[135,33.5],[136.9,34.7],[139.8,35],[140.9,35.7],[141,38.3],[141.5,41.5],[141,43],[144.5,43.3],[145.5,44.3],[141.5,45.5],[140,43.3],[139.5,40.5],[137,37.4],[133,35.5],[131,34.5],[130,33.5],[130,31.5]],
+/* NZ North */[[174,-36],[175.5,-37],[177,-38],[178.5,-38.5],[177,-39.5],[176,-41],[174.8,-41.3],[174,-39.5],[173,-38.5]],
+/* NZ South */[[172.7,-40.5],[174.3,-41.7],[173,-43.5],[171,-45],[168.5,-46.5],[166.7,-45.8],[168.5,-44],[170.5,-42.7],[172,-41]],
+/* Iceland */[[-22.5,64],[-21,63.4],[-18,63.5],[-15,64],[-14.5,65],[-16.5,66.4],[-20,66.3],[-23,65.5],[-24.5,64.8]],
+/* Sumatra */[[95.3,5.5],[98.5,3.5],[101.5,2.5],[104,-1],[105.8,-5.9],[103.5,-5.5],[100.5,-2.5],[97.5,1.5]],
+/* Borneo */[[109.5,1.9],[113,3],[117,4.2],[119,5.5],[118.5,1],[117,-1],[116.5,-3.5],[114,-3.8],[110,-3],[109,-1]],
+/* Java */[[105.2,-6],[110,-6.5],[114.5,-8],[114,-8.7],[110.5,-8.2],[106.5,-7.5]],
+/* Sulawesi */[[119.5,1],[123,.8],[125.2,1.5],[124.5,-.5],[121.5,-1],[122.5,-3.5],[121,-5.5],[120,-5.5],[119.5,-3.5],[119,-1]],
+/* New Guinea */[[131,-1],[135,-2],[139,-2.5],[143,-3.5],[147,-5.5],[150.5,-6.5],[150.5,-10],[146,-8],[141,-8.5],[137.5,-8],[134,-6],[131.5,-4],[130.5,-2]],
+/* Luzon */[[120,18.5],[122,18.5],[122.3,16],[121.6,14.5],[124,13.5],[122,13],[120.9,13.8],[120,15.5]],
+/* Mindanao */[[122,8],[125.5,9.8],[126.5,7.5],[125.5,5.6],[123,6.5]],
+/* Sri Lanka */[[79.8,9.5],[81.2,8.5],[81.8,7],[80.5,5.9],[79.8,7.5]],
+/* Cuba */[[-84.9,21.9],[-82,23.2],[-79.5,22.5],[-77,20.7],[-74.2,20.3],[-77.5,19.9],[-80.5,21.9]],
+/* Hispaniola */[[-74.4,20],[-71.7,19.9],[-68.3,18.6],[-70,18.2],[-72.5,18.2],[-74.4,18.4]],
+/* Newfoundland */[[-59.3,47.6],[-55.5,49.5],[-55.7,51.5],[-57.5,51.4]],
+/* Tasmania */[[144.7,-40.7],[148.3,-40.8],[148,-43.5],[146,-43.6]],
+/* Svalbard */[[11,78],[17,78.2],[21,79.5],[19,80.5],[12,79.8]],
+/* Taiwan */[[120.1,25.3],[121.9,25.1],[121,22.6],[120.2,23]],
+/* Baja California */[[-109.4,23],[-112.2,25.5],[-114,27.8],[-115,29.5],[-114.8,31.8],[-114,30],[-112,27],[-110,24.2]],
+/* Sakhalin */[[142,54.4],[143.4,53],[143.2,49],[142,46],[141.7,49.5],[141.8,52]],
+/* Hawai'i (Big Island) */[[-155.9,20.1],[-155,20],[-154.8,19.5],[-155.6,18.9],[-156,19.7]],
+];
+
+/* ── small maths ──────────────────────────────────────────────── */
+const DEG = Math.PI / 180;
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const ease  = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+/* shortest signed angular difference, radians */
+const wrapPi = a => { while (a >  Math.PI) a -= 2*Math.PI;
+                      while (a < -Math.PI) a += 2*Math.PI; return a; };
+
+/* lon/lat (degrees) → unit sphere. lon 0 faces +Z. */
+function toXYZ(lonDeg, latDeg, r) {
+  const p = latDeg * DEG, l = lonDeg * DEG, c = Math.cos(p) * (r || 1);
+  return [c * Math.sin(l), Math.sin(p) * (r || 1), c * Math.cos(l)];
+}
+
+function mat4Perspective(out, fovy, aspect, near, far) {
+  const f = 1 / Math.tan(fovy / 2), nf = 1 / (near - far);
+  out.fill(0);
+  out[0] = f / aspect; out[5] = f;
+  out[10] = (far + near) * nf; out[11] = -1; out[14] = 2 * far * near * nf;
+  return out;
+}
+function mat4LookAt(out, eye, center, up) {
+  let z0 = eye[0]-center[0], z1 = eye[1]-center[1], z2 = eye[2]-center[2];
+  let l = 1 / Math.hypot(z0, z1, z2); z0*=l; z1*=l; z2*=l;
+  let x0 = up[1]*z2 - up[2]*z1, x1 = up[2]*z0 - up[0]*z2, x2 = up[0]*z1 - up[1]*z0;
+  l = Math.hypot(x0, x1, x2); l = l ? 1/l : 0; x0*=l; x1*=l; x2*=l;
+  const y0 = z1*x2 - z2*x1, y1 = z2*x0 - z0*x2, y2 = z0*x1 - z1*x0;
+  out[0]=x0; out[1]=y0; out[2]=z0; out[3]=0;
+  out[4]=x1; out[5]=y1; out[6]=z1; out[7]=0;
+  out[8]=x2; out[9]=y2; out[10]=z2; out[11]=0;
+  out[12]=-(x0*eye[0]+x1*eye[1]+x2*eye[2]);
+  out[13]=-(y0*eye[0]+y1*eye[1]+y2*eye[2]);
+  out[14]=-(z0*eye[0]+z1*eye[1]+z2*eye[2]);
+  out[15]=1;
+  return out;
+}
+/* project a world point through view then proj; returns [ndcX, ndcY, w] */
+function project(p, view, proj) {
+  const vx = view[0]*p[0] + view[4]*p[1] + view[8]*p[2]  + view[12];
+  const vy = view[1]*p[0] + view[5]*p[1] + view[9]*p[2]  + view[13];
+  const vz = view[2]*p[0] + view[6]*p[1] + view[10]*p[2] + view[14];
+  const cx = proj[0]*vx + proj[8]*vz;
+  const cy = proj[5]*vy + proj[9]*vz;
+  const cw = -vz;
+  return [cx/cw, cy/cw, cw];
+}
+
+/* ── theme palette, read straight off the CSS custom properties ── */
+function hex(name) {
+  const s = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const m = /^#?([0-9a-f]{6})$/i.exec(s);
+  const n = m ? parseInt(m[1], 16) : 0x808080;
+  return [(n >> 16 & 255) / 255, (n >> 8 & 255) / 255, (n & 255) / 255];
+}
+const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const rgba = (c, a) => `rgba(${Math.round(c[0]*255)},${Math.round(c[1]*255)},${Math.round(c[2]*255)},${a})`;
+
+/* ═══ equirectangular chart texture ═══════════════════════════════
+   Ocean wash → graticule → land → coast stroke → faint graticule
+   again over the land, so the grid reads as engraved into the chart.
+   A second single-channel canvas carries the land mask, which the
+   shader uses to keep the ocean specular off the continents.       */
+const TW = 2048, TH = 1024;
+const mapCanvas  = document.createElement("canvas");
+const maskCanvas = document.createElement("canvas");
+mapCanvas.width = TW;  mapCanvas.height = TH;
+maskCanvas.width = TW/2; maskCanvas.height = TH/2;
+
+function ringPath(ctx, ring, w, h) {
+  ctx.beginPath();
+  for (let i = 0; i < ring.length; i++) {
+    const x = (ring[i][0] + 180) / 360 * w;
+    const y = (90 - ring[i][1]) / 180 * h;
+    i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+  }
+  ctx.closePath();
+}
+
+function paintChart() {
+  const deep = hex("--g-ocean-deep"), shoal = hex("--g-ocean-shoal");
+  const land = hex("--g-land"), edge = hex("--g-land-edge"), grid = hex("--g-grid");
+  const c = mapCanvas.getContext("2d");
+
+  /* ocean: cool at the poles, a touch warmer through the tropics */
+  const g = c.createLinearGradient(0, 0, 0, TH);
+  g.addColorStop(0,   rgba(deep, 1));
+  g.addColorStop(.34, rgba(shoal, 1));
+  g.addColorStop(.5,  rgba(shoal, 1));
+  g.addColorStop(.66, rgba(shoal, 1));
+  g.addColorStop(1,   rgba(deep, 1));
+  c.fillStyle = g; c.fillRect(0, 0, TW, TH);
+
+  /* graticule every 15°, with the equator and prime meridian held out */
+  const grat = (alpha, over) => {
+    c.lineWidth = 1.25;
+    c.strokeStyle = rgba(grid, alpha);
+    for (let lon = -180; lon <= 180; lon += 15) {
+      const x = (lon + 180) / 360 * TW;
+      c.beginPath(); c.moveTo(x, 0); c.lineTo(x, TH); c.stroke();
+    }
+    for (let lat = -75; lat <= 75; lat += 15) {
+      const y = (90 - lat) / 180 * TH;
+      c.beginPath(); c.moveTo(0, y); c.lineTo(TW, y); c.stroke();
+    }
+    c.lineWidth = over ? 1.6 : 2.4;
+    c.strokeStyle = rgba(grid, alpha * 1.9);
+    c.beginPath(); c.moveTo(0, TH/2); c.lineTo(TW, TH/2); c.stroke();
+    c.beginPath(); c.moveTo(TW/2, 0); c.lineTo(TW/2, TH); c.stroke();
+    /* tropics + polar circles, dashed */
+    c.setLineDash([9, 13]); c.lineWidth = 1.2;
+    c.strokeStyle = rgba(grid, alpha * 1.25);
+    [23.44, -23.44, 66.56, -66.56].forEach(lat => {
+      const y = (90 - lat) / 180 * TH;
+      c.beginPath(); c.moveTo(0, y); c.lineTo(TW, y); c.stroke();
+    });
+    c.setLineDash([]);
+  };
+  grat(0.20, false);
+
+  /* land */
+  c.lineJoin = "round";
+  LAND.forEach(ring => {
+    ringPath(c, ring, TW, TH);
+    c.fillStyle = rgba(land, 1);       c.fill();
+    c.strokeStyle = rgba(edge, .85); c.lineWidth = 2.2; c.stroke();
+  });
+
+  /* the grid, faintly, riding over the land */
+  c.save(); c.globalCompositeOperation = "multiply";
+  grat(0.085, true);
+  c.restore();
+
+  /* fine grain so the sphere never looks like flat vector fill */
+  const img = c.getImageData(0, 0, TW, TH), d = img.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const n = (Math.random() - .5) * 9;
+    d[i] += n; d[i+1] += n; d[i+2] += n;
+  }
+  c.putImageData(img, 0, 0);
+
+  /* land mask */
+  const m = maskCanvas.getContext("2d");
+  m.fillStyle = "#000"; m.fillRect(0, 0, TW/2, TH/2);
+  m.fillStyle = "#fff"; m.lineJoin = "round";
+  LAND.forEach(ring => { ringPath(m, ring, TW/2, TH/2); m.fill(); });
+}
+
+/* ═══ WebGL ═══════════════════════════════════════════════════════ */
+const stage = document.getElementById("stage");
+const glc   = document.getElementById("gl");
+const uic   = document.getElementById("ui");
+const uictx = uic.getContext("2d");
+const gl = glc.getContext("webgl", { antialias:true, alpha:false, premultipliedAlpha:false })
+        || glc.getContext("experimental-webgl", { antialias:true, alpha:false });
+
+const VS_SPHERE = `
+attribute vec3 aPos; attribute vec2 aUv;
+uniform mat4 uProj, uView; uniform float uScale;
+varying vec2 vUv; varying vec3 vN; varying vec3 vW;
+void main(){
+  vUv = aUv; vN = normalize(aPos); vW = aPos * uScale;
+  gl_Position = uProj * uView * vec4(vW, 1.0);
+}`;
+
+const FS_GLOBE = `
+precision highp float;
+uniform sampler2D uMap, uMask;
+uniform vec3 uCam, uLight, uKey, uAmbTop, uAmbBot, uRim;
+uniform float uSpecK;
+varying vec2 vUv; varying vec3 vN; varying vec3 vW;
+void main(){
+  vec3 N = normalize(vN);
+  vec3 V = normalize(uCam - vW);
+  vec3 L = normalize(uLight);
+  vec3 base  = texture2D(uMap, vUv).rgb;
+  float ocean = 1.0 - texture2D(uMask, vUv).r;
+
+  float nl   = dot(N, L);
+  float wrap = clamp((nl + 0.62) / 1.62, 0.0, 1.0);   // soft, wrapped key
+  float diff = pow(wrap, 1.4);
+  vec3  amb  = mix(uAmbBot, uAmbTop, N.y * 0.5 + 0.5);
+
+  vec3 col = base * (amb + uKey * diff);
+
+  vec3  H = normalize(L + V);
+  float spec = pow(max(dot(N, H), 0.0), 92.0) * ocean * uSpecK * step(0.0, nl);
+  col += uKey * spec;
+
+  float fres = pow(1.0 - max(dot(N, V), 0.0), 3.1);
+  col += uRim * fres * (0.30 + 0.70 * wrap);
+
+  col = vec3(1.0) - exp(-col * 1.32);        // soft shoulder, so no theme blows out
+  gl_FragColor = vec4(col, 1.0);
+}`;
+
+const FS_ATMO = `
+precision highp float;
+uniform vec3 uCam, uHalo, uLight; uniform float uShell, uStrength;
+varying vec3 vW;
+void main(){
+  vec3  rd = normalize(vW - uCam);
+  float b  = length(uCam - rd * dot(uCam, rd));          // ray impact parameter
+  float g  = clamp((uShell - b) / (uShell - 1.0), 0.0, 1.0);
+  float a  = pow(g, 2.5);
+  vec3  N  = normalize(vW);
+  float lit = smoothstep(-0.55, 0.55, dot(N, normalize(uLight)));
+  gl_FragColor = vec4(uHalo * a * (0.20 + 0.80 * lit) * uStrength, 1.0);
+}`;
+
+const VS_MARK = `
+attribute vec3 aCenter; attribute vec2 aCorner; attribute vec2 aMeta;
+uniform mat4 uProj, uView; uniform vec2 uPx; uniform vec3 uCam;
+varying vec2 vC; varying float vFace, vIdx, vSel;
+void main(){
+  vec3 c = aCenter * 1.006;
+  vec4 clip = uProj * uView * vec4(c, 1.0);
+  float size = mix(30.0, 48.0, aMeta.y);
+  clip.xy += aCorner * size * uPx * clip.w;
+  gl_Position = clip;
+  vC = aCorner;
+  vFace = dot(normalize(aCenter), normalize(uCam - aCenter));
+  vIdx = aMeta.x; vSel = aMeta.y;
+}`;
+
+const FS_MARK = `
+precision highp float;
+uniform vec3 uMark, uHot, uKeyline; uniform float uTime, uMotion;
+varying vec2 vC; varying float vFace, vIdx, vSel;
+void main(){
+  float d = length(vC);
+  if (d > 1.0) discard;
+  float pin  = 1.0 - smoothstep(0.100, 0.150, d);              // crisp core disc
+  float key  = smoothstep(0.100, 0.152, d) * (1.0 - smoothstep(0.166, 0.216, d));
+  float halo = exp(-d * d * 10.0);
+  float ph   = fract(uTime * 0.33 + vIdx * 0.137);
+  float ring = exp(-pow((d - ph * 0.94) / 0.062, 2.0)) * (1.0 - ph) * uMotion;
+  float edge = 1.0 - smoothstep(0.80, 1.0, d);
+  float face = smoothstep(-0.05, 0.24, vFace);
+  float vis  = edge * face;
+
+  float aCore = pin * (0.90 + 0.10 * vSel);
+  float aKey  = key * (0.72 + 0.28 * vSel);
+  float aGlow = clamp(halo * (0.32 + 0.34 * vSel) + ring * (0.45 + 0.55 * vSel), 0.0, 1.0);
+
+  /* composite core over keyline over glow, then premultiply */
+  float a1 = aKey  + aGlow * (1.0 - aKey);
+  vec3  c1 = uKeyline * aKey + uMark * aGlow * (1.0 - aKey);
+  float a  = (aCore + a1 * (1.0 - aCore)) * vis;
+  vec3  rgb = (uHot * aCore + c1 * (1.0 - aCore)) * vis;
+  gl_FragColor = vec4(rgb, a);
+}`;
+
+function compile(src, type) {
+  const s = gl.createShader(type);
+  gl.shaderSource(s, src); gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS))
+    throw new Error(gl.getShaderInfoLog(s));
+  return s;
+}
+function program(vs, fs) {
+  const p = gl.createProgram();
+  gl.attachShader(p, compile(vs, gl.VERTEX_SHADER));
+  gl.attachShader(p, compile(fs, gl.FRAGMENT_SHADER));
+  gl.linkProgram(p);
+  if (!gl.getProgramParameter(p, gl.LINK_STATUS))
+    throw new Error(gl.getProgramInfoLog(p));
+  p.u = new Proxy({}, { get: (c, k) => k in c ? c[k] : (c[k] = gl.getUniformLocation(p, k)) });
+  p.a = new Proxy({}, { get: (c, k) => k in c ? c[k] : (c[k] = gl.getAttribLocation(p, k)) });
+  return p;
+}
+
+/* UV sphere */
+function sphere(segX, segY) {
+  const pos = [], uv = [], idx = [];
+  for (let i = 0; i <= segY; i++) {
+    const lat = 90 - 180 * i / segY;
+    for (let j = 0; j <= segX; j++) {
+      const lon = -180 + 360 * j / segX;
+      pos.push(...toXYZ(lon, lat, 1));
+      uv.push(j / segX, i / segY);
+    }
+  }
+  const row = segX + 1;
+  for (let i = 0; i < segY; i++)
+    for (let j = 0; j < segX; j++) {
+      const a = i*row + j, b = a + row;
+      idx.push(a, b, a+1, a+1, b, b+1);
+    }
+  return { pos:new Float32Array(pos), uv:new Float32Array(uv), idx:new Uint16Array(idx) };
+}
+
+function buffer(data, target) {
+  const b = gl.createBuffer();
+  gl.bindBuffer(target, b);
+  gl.bufferData(target, data, gl.STATIC_DRAW);
+  return b;
+}
+function texture(canvas) {
+  const t = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, t);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
+  gl.generateMipmap(gl.TEXTURE_2D);
+  return t;
+}
+
+/* ═══ scene ═══════════════════════════════════════════════════════ */
+const FOV = 38 * DEG, SHELL = 1.165;
+const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+
+let progGlobe, progAtmo, progMark, geo, bufPos, bufUv, bufIdx, texMap, texMask;
+let bufMCenter, bufMCorner, bufMMeta, bufMIdx, metaArr;
+let ok = true;
+
+try {
+  if (!gl) throw new Error("no webgl context");
+  paintChart();
+  progGlobe = program(VS_SPHERE, FS_GLOBE);
+  progAtmo  = program(VS_SPHERE, FS_ATMO);
+  progMark  = program(VS_MARK,   FS_MARK);
+
+  geo = sphere(144, 72);
+  bufPos = buffer(geo.pos, gl.ARRAY_BUFFER);
+  bufUv  = buffer(geo.uv,  gl.ARRAY_BUFFER);
+  bufIdx = buffer(geo.idx, gl.ELEMENT_ARRAY_BUFFER);
+  texMap  = texture(mapCanvas);
+  texMask = texture(maskCanvas);
+
+  const N = STATIONS.length;
+  const ctr = new Float32Array(N*12), cor = new Float32Array(N*8), mi = new Uint16Array(N*6);
+  metaArr = new Float32Array(N*8);
+  const CORNERS = [-1,-1, 1,-1, 1,1, -1,1];
+  STATIONS.forEach((s, i) => {
+    const p = toXYZ(s.lon, s.lat, 1);
+    for (let v = 0; v < 4; v++) {
+      ctr.set(p, i*12 + v*3);
+      cor[i*8 + v*2] = CORNERS[v*2]; cor[i*8 + v*2 + 1] = CORNERS[v*2 + 1];
+      metaArr[i*8 + v*2] = i; metaArr[i*8 + v*2 + 1] = 0;
+    }
+    const b = i*4;
+    mi.set([b, b+1, b+2, b, b+2, b+3], i*6);
+  });
+  bufMCenter = buffer(ctr, gl.ARRAY_BUFFER);
+  bufMCorner = buffer(cor, gl.ARRAY_BUFFER);
+  bufMIdx    = buffer(mi,  gl.ELEMENT_ARRAY_BUFFER);
+  bufMMeta   = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufMMeta);
+  gl.bufferData(gl.ARRAY_BUFFER, metaArr, gl.DYNAMIC_DRAW);
+
+  gl.enable(gl.DEPTH_TEST);
+  gl.depthFunc(gl.LEQUAL);
+  gl.enable(gl.CULL_FACE);
+} catch (err) {
+  ok = false; stage.classList.add("failed");
+  console.warn("Meridian Watch: falling back to the list —", err.message);
+}
+
+/* palette uniforms, refreshed whenever the theme flips */
+let PAL = {};
+function readPalette() {
+  PAL = {
+    key:hex("--g-key"), ambTop:hex("--g-amb-top"), ambBot:hex("--g-amb-bot"),
+    rim:hex("--g-rim"), halo:hex("--g-halo"),
+    mark:hex("--g-mark"), hot:hex("--g-mark-hot"), keyline:hex("--g-mark-key"),
+    spec:parseFloat(css("--g-spec")) || 0.4,
+    brass:css("--brass"), ink:css("--ink"), ink3:css("--ink-3"),
+    strength:parseFloat(css("--halo-strength")) || 0,
+    seat:parseFloat(css("--seat-alpha")) || 0,
+    seatColor:hex("--seat-color"),
+  };
+}
+readPalette();
+
+/* ── camera + interaction state ─────────────────────────────────── */
+const cam = { lon: -1.45, lat: 0.30, zoom: 1 };
+const vel = { lon: 0, lat: 0 };
+let baseDist = 3.0, shiftX = 0, shiftY = 0, W = 1, H = 1, dpr = 1;
+let spinning = !reduced.matches, autoPref = !reduced.matches;
+let holdUntil = 0, dragging = false, moved = 0, lastPt = null, pointerId = null;
+let selected = -1, hovered = -1, meridian = -1;
+let tween = null;
+const AUTO = 0.055;                                    // rad · s⁻¹
+const proj = new Float32Array(16), view = new Float32Array(16);
+const scr = STATIONS.map(() => ({ x:0, y:0, face:-1, on:false }));
+
+function resize() {
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  W = stage.clientWidth; H = stage.clientHeight;
+  [glc, uic].forEach(c => {
+    c.width = Math.round(W * dpr); c.height = Math.round(H * dpr);
+  });
+  uictx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const wide = W >= 900;
+  shiftX = wide ? Math.min(0.30, 330 / W) : 0;
+  shiftY = wide ? 0.02 : 0.10;
+  const availW = W - (wide ? 420 : 26);
+  const availH = H - (wide ? 150 : 280);
+  const rPx = wide
+    ? Math.max(84, Math.min(availH * 0.46, availW * 0.46, Math.min(W, H) * 0.38))
+    : Math.max(80, Math.min(availH * 0.46, availW * 0.5));
+  baseDist = clamp(H / (2 * rPx * Math.tan(FOV / 2)), 1.9, 9);
+  if (ok) gl.viewport(0, 0, glc.width, glc.height);
+}
+
+function globeScreen() {
+  const d = baseDist * cam.zoom;
+  const r = (H / 2) * Math.tan(Math.asin(clamp(1 / d, -1, 1))) / Math.tan(FOV / 2);
+  return { x:(shiftX * .5 + .5) * W, y:(.5 - shiftY * .5) * H, r };
+}
+
+/* ── the render loop ────────────────────────────────────────────── */
+let tPrev = performance.now(), clock = 0;
+
+function frame(now) {
+  const dt = Math.min((now - tPrev) / 1000, 0.05); tPrev = now; clock += dt;
+
+  /* camera integration */
+  if (tween) {
+    const k = clamp((now - tween.t0) / tween.dur, 0, 1), e = ease(k);
+    cam.lon  = tween.lon0  + tween.dLon * e;
+    cam.lat  = tween.lat0  + tween.dLat * e;
+    cam.zoom = tween.zoom0 + tween.dZoom * e;
+    if (k >= 1) tween = null;
+  } else if (!dragging) {
+    cam.lon += vel.lon * dt; cam.lat += vel.lat * dt;
+    const damp = Math.pow(0.0016, dt);
+    vel.lon *= damp; vel.lat *= damp;
+    if (spinning && now > holdUntil && selected < 0) cam.lon += AUTO * dt;
+    cam.lat = clamp(cam.lat, -1.42, 1.42);
+  }
+
+  const d = baseDist * cam.zoom;
+  const eye = [d*Math.cos(cam.lat)*Math.sin(cam.lon), d*Math.sin(cam.lat), d*Math.cos(cam.lat)*Math.cos(cam.lon)];
+  mat4Perspective(proj, FOV, W / H, 0.1, 40);
+  proj[8] = -shiftX; proj[9] = -shiftY;
+  mat4LookAt(view, eye, [0,0,0], [0,1,0]);
+
+  /* key light rides with the camera: upper-left, slightly ahead, so the
+     terminator always falls across the visible face                  */
+  const e0 = [eye[0]/d, eye[1]/d, eye[2]/d];
+  let rx = -e0[2], ry = 0, rz = e0[0];                 // cross(worldUp, e)
+  const rl = Math.hypot(rx, rz) || 1; rx /= rl; rz /= rl;
+  const ux = e0[1]*rz - e0[2]*ry, uy = e0[2]*rx - e0[0]*rz, uz = e0[0]*ry - e0[1]*rx;
+  const L = [ e0[0]*0.60 + ux*0.46 - rx*0.55,
+              e0[1]*0.60 + uy*0.46 - ry*0.55,
+              e0[2]*0.60 + uz*0.46 - rz*0.55 ];
+
+  if (ok) drawGL(eye, L);
+  updateScreenSpace();
+  drawOverlay();
+  syncChrome();
+  requestAnimationFrame(frame);
+}
+
+const MAXA = gl ? gl.getParameter(gl.MAX_VERTEX_ATTRIBS) : 0;
+function resetAttribs() { for (let i = 0; i < MAXA; i++) gl.disableVertexAttribArray(i); }
+
+function attrib(p, name, buf, size) {
+  const loc = p.a[name];
+  if (loc < 0) return;
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, size, gl.FLOAT, false, 0, 0);
+}
+
+function drawGL(eye, L) {
+  const bg = hex("--ground-2");
+  gl.clearColor(bg[0], bg[1], bg[2], 1);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+  /* 1 · globe */
+  gl.disable(gl.BLEND); gl.depthMask(true); gl.cullFace(gl.BACK);
+  resetAttribs();
+  gl.useProgram(progGlobe);
+  attrib(progGlobe, "aPos", bufPos, 3); attrib(progGlobe, "aUv", bufUv, 2);
+  gl.uniformMatrix4fv(progGlobe.u.uProj, false, proj);
+  gl.uniformMatrix4fv(progGlobe.u.uView, false, view);
+  gl.uniform1f(progGlobe.u.uScale, 1);
+  gl.uniform3fv(progGlobe.u.uCam, eye);
+  gl.uniform3fv(progGlobe.u.uLight, L);
+  gl.uniform3fv(progGlobe.u.uKey, PAL.key);
+  gl.uniform3fv(progGlobe.u.uAmbTop, PAL.ambTop);
+  gl.uniform3fv(progGlobe.u.uAmbBot, PAL.ambBot);
+  gl.uniform3fv(progGlobe.u.uRim, PAL.rim);
+  gl.uniform1f(progGlobe.u.uSpecK, PAL.spec);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, texMap);
+  gl.uniform1i(progGlobe.u.uMap, 0);
+  gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, texMask);
+  gl.uniform1i(progGlobe.u.uMask, 1);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bufIdx);
+  gl.drawElements(gl.TRIANGLES, geo.idx.length, gl.UNSIGNED_SHORT, 0);
+
+  /* 2 · atmosphere — back faces of a slightly larger shell, additive */
+  gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE);   // additive
+  gl.depthMask(false); gl.cullFace(gl.FRONT);
+  resetAttribs();
+  gl.useProgram(progAtmo);
+  attrib(progAtmo, "aPos", bufPos, 3); attrib(progAtmo, "aUv", bufUv, 2);
+  gl.uniformMatrix4fv(progAtmo.u.uProj, false, proj);
+  gl.uniformMatrix4fv(progAtmo.u.uView, false, view);
+  gl.uniform1f(progAtmo.u.uScale, SHELL);
+  gl.uniform1f(progAtmo.u.uShell, SHELL);
+  gl.uniform1f(progAtmo.u.uStrength, PAL.strength);
+  gl.uniform3fv(progAtmo.u.uCam, eye);
+  gl.uniform3fv(progAtmo.u.uLight, L);
+  gl.uniform3fv(progAtmo.u.uHalo, PAL.halo);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bufIdx);
+  gl.drawElements(gl.TRIANGLES, geo.idx.length, gl.UNSIGNED_SHORT, 0);
+
+  /* 3 · markers — screen-facing billboards, occluded by the globe */
+  gl.disable(gl.CULL_FACE);
+  gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);        // premultiplied over
+  resetAttribs();
+  gl.useProgram(progMark);
+  attrib(progMark, "aCenter", bufMCenter, 3);
+  attrib(progMark, "aCorner", bufMCorner, 2);
+  attrib(progMark, "aMeta",   bufMMeta,   2);
+  gl.uniformMatrix4fv(progMark.u.uProj, false, proj);
+  gl.uniformMatrix4fv(progMark.u.uView, false, view);
+  gl.uniform3fv(progMark.u.uCam, eye);
+  gl.uniform2f(progMark.u.uPx, 2 / W, 2 / H);
+  gl.uniform1f(progMark.u.uTime, clock);
+  gl.uniform1f(progMark.u.uMotion, reduced.matches ? 0 : 1);
+  gl.uniform3fv(progMark.u.uMark, PAL.mark);
+  gl.uniform3fv(progMark.u.uHot, PAL.hot);
+  gl.uniform3fv(progMark.u.uKeyline, PAL.keyline);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bufMIdx);
+  gl.drawElements(gl.TRIANGLES, STATIONS.length * 6, gl.UNSIGNED_SHORT, 0);
+  gl.enable(gl.CULL_FACE);
+}
+
+/* ── screen-space bookkeeping for picking + labels ──────────────── */
+function updateScreenSpace() {
+  const d = baseDist * cam.zoom;
+  const eye = [d*Math.cos(cam.lat)*Math.sin(cam.lon), d*Math.sin(cam.lat), d*Math.cos(cam.lat)*Math.cos(cam.lon)];
+  STATIONS.forEach((s, i) => {
+    const p = toXYZ(s.lon, s.lat, 1.006);
+    const n = project(p, view, proj);
+    const face = (p[0]*(eye[0]-p[0]) + p[1]*(eye[1]-p[1]) + p[2]*(eye[2]-p[2]))
+               / (Math.hypot(p[0],p[1],p[2]) * Math.hypot(eye[0]-p[0], eye[1]-p[1], eye[2]-p[2]));
+    const t = scr[i];
+    t.x = (n[0] * .5 + .5) * W;
+    t.y = (.5 - n[1] * .5) * H;
+    t.face = face;
+    t.on = n[2] > 0 && face > 0.02;
+  });
+}
+
+/* ── 2D overlay: bearing ring, leader line, label ───────────────── */
+function drawOverlay() {
+  const g = globeScreen();
+  uictx.clearRect(0, 0, W, H);
+
+  /* the ring is an instrument bezel: 15° ticks, longer at the cardinals */
+  const R = Math.min(g.r * 1.118, Math.min(W, H) / 2 - 20);
+  uictx.save();
+  uictx.translate(g.x, g.y);
+
+  if (PAL.seat > 0.001) {
+    const R2 = g.r * 1.62;
+    const grd = uictx.createRadialGradient(0, 0, g.r * 0.985, 0, 0, R2);
+    grd.addColorStop(0,   rgba(PAL.seatColor, PAL.seat));
+    grd.addColorStop(.34, rgba(PAL.seatColor, PAL.seat * 0.38));
+    grd.addColorStop(1,   rgba(PAL.seatColor, 0));
+    uictx.fillStyle = grd;
+    uictx.beginPath();
+    uictx.arc(0, 0, R2, 0, Math.PI * 2);
+    uictx.arc(0, 0, g.r * 0.985, 0, Math.PI * 2, true);   // punch the sphere out
+    uictx.fill();
+  }
+
+  uictx.strokeStyle = PAL.brass; uictx.lineWidth = 1;
+  uictx.globalAlpha = 0.36;
+  uictx.beginPath(); uictx.arc(0, 0, R, 0, Math.PI * 2); uictx.stroke();
+  uictx.globalAlpha = 0.13;
+  uictx.beginPath(); uictx.arc(0, 0, R + 11, 0, Math.PI * 2); uictx.stroke();
+  for (let a = 0; a < 360; a += 15) {
+    const major = a % 90 === 0, len = major ? 11 : 5.5;
+    const r = a * DEG, c = Math.cos(r), s = Math.sin(r);
+    uictx.globalAlpha = major ? 0.62 : 0.34;
+    uictx.beginPath();
+    uictx.moveTo(c * R, s * R); uictx.lineTo(c * (R + len), s * (R + len));
+    uictx.stroke();
+  }
+  uictx.restore();
+
+  /* label whichever marker is under the cursor, or the focused one */
+  const i = hovered >= 0 ? hovered : selected;
+  if (i >= 0 && scr[i].on) {
+    const t = scr[i], s = STATIONS[i];
+    const right = t.x < W * 0.5, dx = right ? 1 : -1;
+    const ax = t.x + dx * 15, ay = t.y - 13;
+    const bx = ax + dx * 26, by = ay - 12;
+    uictx.save();
+    uictx.strokeStyle = PAL.brass; uictx.globalAlpha = 0.65; uictx.lineWidth = 1;
+    uictx.beginPath();
+    uictx.moveTo(t.x + dx * 9, t.y - 7); uictx.lineTo(ax, ay); uictx.lineTo(bx, by);
+    uictx.stroke();
+    uictx.globalAlpha = 1;
+    uictx.textBaseline = "bottom";
+    uictx.textAlign = right ? "left" : "right";
+    try { uictx.letterSpacing = "0.09em"; } catch (e) {}
+    uictx.font = '500 10px "IBM Plex Mono", monospace';
+    uictx.fillStyle = PAL.brass;
+    uictx.fillText(s.kind.toUpperCase(), bx + dx * 7, by - 15);
+    try { uictx.letterSpacing = "0em"; } catch (e) {}
+    uictx.font = '500 14px Fraunces, Georgia, serif';
+    uictx.fillStyle = PAL.ink;
+    uictx.fillText(s.name, bx + dx * 7, by - 2);
+    uictx.restore();
+  }
+}
+
+/* ── chrome ─────────────────────────────────────────────────────── */
+const railList = document.getElementById("railList");
+const rotor = document.getElementById("rotor");
+const rotorLabel = document.getElementById("rotorLabel");
+const bearingEl = document.getElementById("bearing");
+const dossier = document.getElementById("dossier");
+
+const fmtLat = v => `${Math.abs(v).toFixed(4)}° ${v < 0 ? "S" : "N"}`;
+const fmtLon = v => `${Math.abs(v).toFixed(4)}° ${v < 0 ? "W" : "E"}`;
+const shortLon = v => `${Math.abs(v).toFixed(1)}°${v < 0 ? "W" : "E"}`;
+
+const rows = STATIONS.map((s, i) => {
+  const b = document.createElement("button");
+  b.className = "loc"; b.type = "button"; b.dataset.i = i;
+  b.innerHTML =
+    `<span class="loc-body">` +
+      `<span class="loc-name">${s.name}</span>` +
+      `<span class="loc-region">${s.region}</span>` +
+    `</span>` +
+    `<span class="loc-lon">${shortLon(s.lon)}</span>`;
+  b.addEventListener("click", () => focusOn(i));
+  railList.appendChild(b);
+  return b;
+});
+
+let lastMeridian = -1, lastSelected = -2, lastSpin = null, lastBearing = "";
+function syncChrome() {
+  /* which station currently sits nearest the meridian facing us */
+  let best = 0, bd = 9;
+  STATIONS.forEach((s, i) => {
+    const dd = Math.abs(wrapPi(s.lon * DEG - cam.lon));
+    if (dd < bd) { bd = dd; best = i; }
+  });
+  meridian = bd < 0.62 ? best : -1;
+
+  if (meridian !== lastMeridian || selected !== lastSelected) {
+    rows.forEach((r, i) => {
+      r.classList.toggle("is-meridian", i === meridian && i !== selected);
+      r.classList.toggle("is-active", i === selected);
+      r.setAttribute("aria-current", i === selected ? "true" : "false");
+    });
+    lastMeridian = meridian; lastSelected = selected;
+  }
+
+  const spin = spinning && selected < 0 && !dragging && performance.now() > holdUntil;
+  if (spin !== lastSpin) {
+    rotor.classList.toggle("spinning", spin);
+    rotor.setAttribute("aria-pressed", String(spinning));
+    rotorLabel.textContent = !spinning ? "Auto-rotate off"
+                           : selected >= 0 ? "Held on station"
+                           : spin ? "Auto-rotate engaged" : "Auto-rotate paused";
+    lastSpin = spin;
+  }
+  const bLat = cam.lat / DEG, bLon = ((cam.lon / DEG + 540) % 360) - 180;
+  const read = `${Math.abs(bLat).toFixed(1)}\u00B0 ${bLat < 0 ? "S" : "N"}\u2003`
+             + `${Math.abs(bLon).toFixed(1)}\u00B0 ${bLon < 0 ? "W" : "E"}`;
+  if (read !== lastBearing) { bearingEl.textContent = read; lastBearing = read; }
+}
+
+/* ── focus & release ────────────────────────────────────────────── */
+function glideTo(lon, lat, zoom, ms) {
+  const dur = reduced.matches ? 240 : (ms || 1150);
+  tween = {
+    t0:performance.now(), dur,
+    lon0:cam.lon, lat0:cam.lat, zoom0:cam.zoom,
+    dLon:wrapPi(lon - cam.lon), dLat:lat - cam.lat, dZoom:zoom - cam.zoom,
+  };
+  vel.lon = vel.lat = 0;
+}
+
+function focusOn(i) {
+  const s = STATIONS[i];
+  selected = i;
+  setMeta();
+  glideTo(s.lon * DEG, clamp(s.lat * DEG, -1.42, 1.42), 0.88);
+  const d = document.getElementById.bind(document);
+  d("dEyebrow").textContent = s.kind;
+  d("dName").textContent    = s.name;
+  d("dWhere").textContent   = s.region;
+  d("dNote").textContent    = s.note;
+  d("dLat").textContent     = fmtLat(s.lat);
+  d("dLon").textContent     = fmtLon(s.lon);
+  d("dOp").textContent      = s.op;
+  dossier.classList.add("is-open");
+  rows[i].scrollIntoView({ block:"nearest", inline:"center",
+    behavior: reduced.matches ? "auto" : "smooth" });
+}
+
+function release(resume) {
+  if (selected < 0 && !dossier.classList.contains("is-open")) return;
+  selected = -1;
+  setMeta();
+  dossier.classList.remove("is-open");
+  glideTo(cam.lon, cam.lat * 0.55, 1, 800);
+  if (resume !== false) { spinning = autoPref; holdUntil = performance.now() + 900; }
+  lastSpin = null;
+}
+
+function setMeta() {
+  if (!ok) return;
+  for (let i = 0; i < STATIONS.length; i++) {
+    const v = i === selected ? 1 : i === hovered ? 0.42 : 0;
+    for (let v4 = 0; v4 < 4; v4++) metaArr[i*8 + v4*2 + 1] = v;
+  }
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufMMeta);
+  gl.bufferSubData(gl.ARRAY_BUFFER, 0, metaArr);
+}
+
+/* ── pointer: drag to spin, click to focus ──────────────────────── */
+function pick(px, py) {
+  let best = -1, bd = 30;
+  for (let i = 0; i < STATIONS.length; i++) {
+    if (!scr[i].on) continue;
+    const dd = Math.hypot(scr[i].x - px, scr[i].y - py);
+    if (dd < bd) { bd = dd; best = i; }
+  }
+  return best;
+}
+function localPt(e) {
+  const r = glc.getBoundingClientRect();
+  return { x:e.clientX - r.left, y:e.clientY - r.top };
+}
+
+glc.addEventListener("pointerdown", e => {
+  if (pointerId !== null) return;
+  pointerId = e.pointerId;
+  glc.setPointerCapture(e.pointerId);
+  dragging = true; moved = 0; tween = null;
+  vel.lon = vel.lat = 0;
+  lastPt = localPt(e);
+  glc.classList.add("dragging");
+});
+
+glc.addEventListener("pointermove", e => {
+  const p = localPt(e);
+  if (dragging && e.pointerId === pointerId) {
+    const dx = p.x - lastPt.x, dy = p.y - lastPt.y;
+    lastPt = p; moved += Math.abs(dx) + Math.abs(dy);
+    /* roughly half a turn per screen-width of drag, scaled by the zoom */
+    const kx = 2.55 / Math.max(W, 480) * cam.zoom;
+    const ky = 2.10 / Math.max(H, 420) * cam.zoom;
+    cam.lon -= dx * kx;
+    cam.lat  = clamp(cam.lat + dy * ky, -1.42, 1.42);
+    vel.lon = -dx * kx * 46; vel.lat = dy * ky * 40;
+    holdUntil = performance.now() + 2400;
+  } else {
+    const h = pick(p.x, p.y);
+    if (h !== hovered) { hovered = h; setMeta(); glc.classList.toggle("overmark", h >= 0); }
+  }
+});
+
+function endDrag(e) {
+  if (e.pointerId !== pointerId) return;
+  pointerId = null; dragging = false;
+  glc.classList.remove("dragging");
+  holdUntil = performance.now() + 2400;
+  if (moved < 6) {                       /* a tap, not a drag */
+    const p = localPt(e), hit = pick(p.x, p.y);
+    if (hit >= 0) { vel.lon = vel.lat = 0; focusOn(hit); }
+    else if (selected >= 0) release(true);
+  }
+}
+glc.addEventListener("pointerup", endDrag);
+glc.addEventListener("pointercancel", e => {
+  if (e.pointerId !== pointerId) return;
+  pointerId = null; dragging = false; glc.classList.remove("dragging");
+});
+glc.addEventListener("pointerleave", () => {
+  if (!dragging && hovered >= 0) { hovered = -1; setMeta(); glc.classList.remove("overmark"); }
+});
+
+document.getElementById("release").addEventListener("click", () => { release(true); });
+
+rotor.addEventListener("click", () => {
+  spinning = autoPref = !spinning;
+  if (spinning) { holdUntil = performance.now(); if (selected >= 0) release(true); }
+  lastSpin = null;
+});
+
+addEventListener("keydown", e => {
+  if (e.key === "Escape" && selected >= 0) { release(true); e.preventDefault(); }
+  else if (e.key === " " && e.target === document.body) { rotor.click(); e.preventDefault(); }
+});
+
+/* ── theme flips: repaint the chart and re-read the palette ─────── */
+let repaintPending = 0;
+function onThemeChange() {
+  clearTimeout(repaintPending);
+  repaintPending = setTimeout(() => {
+    readPalette();
+    if (!ok) return;
+    paintChart();
+    gl.bindTexture(gl.TEXTURE_2D, texMap);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, mapCanvas);
+    gl.generateMipmap(gl.TEXTURE_2D);
+  }, 30);
+}
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", onThemeChange);
+new MutationObserver(onThemeChange)
+  .observe(document.documentElement, { attributes:true, attributeFilter:["data-theme","class","style"] });
+reduced.addEventListener("change", () => {
+  if (reduced.matches) spinning = autoPref = false;
+  lastSpin = null;
+});
+
+/* ── go ─────────────────────────────────────────────────────────── */
+glc.addEventListener("webglcontextlost", e => {
+  e.preventDefault(); ok = false; stage.classList.add("failed");
+});
+
+addEventListener("resize", resize);
+resize();
+setMeta();
+requestAnimationFrame(frame);
+
+/* open on the station under the meridian at load, after the first sweep */
+if (!reduced.matches) {
+  cam.lon = STATIONS[4].lon * DEG - 0.85;
+  cam.lat = 0.26;
+}
+</script>
