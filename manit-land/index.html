@@ -1,0 +1,1309 @@
+<title>The Manit Land Election</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Patrick+Hand&family=Rubik:wght@400;600&display=swap">
+
+<style>
+/* A cartoon screened in the parliament's own velvet-and-brass hall.
+   The film is the same in every theme, so the page commits to one look. */
+:root{
+  color-scheme: dark;
+  --velvet:#16302A; --velvet-2:#1F3F37; --velvet-3:#2A5249;
+  --brass:#D9AE4E; --brass-dim:#9C7D3A;
+  --ivory:#F3EAD6; --muted:#B9C4B8; --ink:#1B1411;
+  --slab:"Alfa Slab One", Rockwell, "Roboto Slab", Georgia, serif;
+  --hand:"Patrick Hand", "Comic Sans MS", "Chalkboard SE", cursive;
+  --ui:Rubik, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+*{box-sizing:border-box}
+body{
+  background:
+    radial-gradient(1200px 500px at 50% -120px, var(--velvet-3), transparent 70%),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.10) 0 2px, transparent 2px 22px),
+    var(--velvet);
+  color:var(--ivory); font-family:var(--ui); min-height:100%;
+}
+.wrap{max-width:1120px; margin:0 auto; padding-inline:16px; padding-block:28px 40px; display:grid; gap:18px}
+header{display:grid; gap:6px}
+.eyebrow{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--brass)}
+h1{font-family:var(--slab); font-weight:400; font-size:clamp(28px,5vw,48px); line-height:1.05; margin:0; text-wrap:balance; color:var(--ivory)}
+h1 em{font-style:normal; color:var(--brass)}
+.lede{font-family:var(--hand); font-size:20px; color:var(--muted); margin:0; max-width:62ch}
+
+.stage{position:relative; border:3px solid var(--brass); border-radius:12px; overflow:hidden; background:#000;
+  box-shadow:0 0 0 6px var(--ink), 0 24px 60px rgba(0,0,0,.55); aspect-ratio:16/9; max-width:100%}
+.stage canvas{display:block; width:100%; height:100%; cursor:pointer}
+.big-play{position:absolute; inset:0; display:grid; place-items:center; background:rgba(10,20,17,.28); border:0; cursor:pointer; color:var(--ink)}
+.big-play span{display:flex; align-items:center; gap:12px; background:var(--brass); border:3px solid var(--ink); border-radius:999px;
+  padding:14px 26px 14px 20px; font-family:var(--slab); font-size:clamp(16px,2.6vw,24px); box-shadow:0 6px 0 var(--ink)}
+.big-play:hover span{transform:translateY(-2px); box-shadow:0 8px 0 var(--ink)}
+.big-play:focus-visible span{outline:3px solid var(--ivory); outline-offset:4px}
+.big-play svg{width:26px; height:26px}
+
+.bar{display:flex; align-items:center; gap:10px; flex-wrap:wrap; background:var(--velvet-2); border:1px solid rgba(217,174,78,.35);
+  border-radius:10px; padding:10px 12px}
+.btn{appearance:none; border:2px solid var(--brass); background:transparent; color:var(--ivory); border-radius:8px; height:38px; min-width:38px;
+  padding:0 10px; display:inline-flex; align-items:center; justify-content:center; gap:6px; font:600 14px var(--ui); cursor:pointer}
+.btn:hover{background:rgba(217,174,78,.16)}
+.btn:focus-visible, .chap:focus-visible, #seek:focus-visible{outline:3px solid var(--ivory); outline-offset:2px}
+.btn svg{width:18px; height:18px}
+.time{font-variant-numeric:tabular-nums; font-size:14px; color:var(--muted); min-width:92px; text-align:center}
+.seekwrap{flex:1 1 240px; position:relative; height:38px; display:flex; align-items:center}
+#seek{width:100%; accent-color:var(--brass); margin:0; position:relative; z-index:1}
+.ticks{position:absolute; left:0; right:0; top:50%; height:14px; transform:translateY(-50%); pointer-events:none}
+.ticks i{position:absolute; top:0; width:2px; height:14px; background:rgba(243,234,214,.35)}
+
+.chapters{display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:8px; padding:0; margin:0; list-style:none}
+.chap{width:100%; text-align:left; display:grid; grid-template-columns:auto 1fr; gap:2px 10px; align-items:baseline;
+  background:rgba(0,0,0,.18); border:1px solid rgba(217,174,78,.25); color:var(--ivory); border-radius:8px; padding:9px 12px; cursor:pointer; font:14px var(--ui)}
+.chap b{font-family:var(--slab); font-weight:400; color:var(--brass-dim); font-size:13px; font-variant-numeric:tabular-nums}
+.chap small{grid-column:2; color:var(--muted); font-size:12px; font-variant-numeric:tabular-nums}
+.chap:hover{border-color:var(--brass)}
+.chap.on{background:var(--brass); color:var(--ink); border-color:var(--brass)}
+.chap.on b, .chap.on small{color:var(--ink)}
+
+.cast{font-family:var(--hand); font-size:18px; color:var(--muted); margin:0; line-height:1.4}
+.cast strong{color:var(--ivory); font-weight:400}
+@media (max-width:520px){ .time{min-width:auto} .btn .lbl{display:none} }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">A Very Official Cartoon of Manit Land · about 2 minutes</div>
+    <h1>The Manit Land <em>Election</em></h1>
+    <p class="lede">How the Junior Minister of Paperwork, Manit Khatri, out-foxed every other minister and moved into the Presidential House.</p>
+  </header>
+
+  <div class="stage" id="stage">
+    <canvas id="cv" aria-label="Animated cartoon: The Manit Land Election"></canvas>
+    <button class="big-play" id="bigPlay" aria-label="Play the story with sound">
+      <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l13 8-13 8z" fill="currentColor"/></svg>Play the story</span>
+    </button>
+  </div>
+
+  <div class="bar">
+    <button class="btn" id="play" aria-label="Play"><svg viewBox="0 0 24 24" aria-hidden="true"><path id="playIcon" d="M7 4l13 8-13 8z" fill="currentColor"/></svg></button>
+    <button class="btn" id="restart" aria-label="Restart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V1L7 6l5 5V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z" fill="currentColor"/></svg></button>
+    <span class="time" id="time">0:00 / 2:10</span>
+    <div class="seekwrap"><div class="ticks" id="ticks"></div><input id="seek" type="range" min="0" max="130" step="0.05" value="0" aria-label="Seek"></div>
+    <button class="btn" id="sound" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path id="waves" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="2" fill="none"/></svg><span class="lbl">Sound on</span></button>
+  </div>
+
+  <ol class="chapters" id="chapters"></ol>
+
+  <p class="cast"><strong>Starring</strong> Manit Khatri (Junior Minister of Paperwork), Aryan (the loudest), Abeer (the best hair), Aadi (the calculator), Bholu (asleep), Chintu (eating), one duck, and Churi the Royal Cat.</p>
+</div>
+<script>
+/* ================= core: canvas, maths, ink primitives ================= */
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+const W = 1280, H = 720, DUR = 130;
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const INK = '#2A1C16';
+const FT = '"Alfa Slab One", Rockwell, "Roboto Slab", Georgia, serif';
+const FH = '"Patrick Hand", "Comic Sans MS", "Chalkboard SE", cursive';
+const PI = Math.PI, TAU = PI * 2;
+let K = 1, BOIL = 0;
+
+function resize() {
+  const r = cv.getBoundingClientRect();
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.max(320, Math.round(r.width * dpr));
+  cv.height = Math.round(cv.width * 9 / 16);
+  K = cv.width / W;
+}
+
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const ease = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+const eOut = t => 1 - Math.pow(1 - t, 3);
+const eBack = t => { const c = 1.70158; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+const ep = (t, a, b) => ease(prog(t, a, b));
+const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+// hand-drawn "line boil": everything jitters a hair, eight times a second
+const wob = (seed, amp = 1) => reduced ? 0 : (hash(seed * 3.17 + BOIL * 7.3) - .5) * 2 * amp;
+
+function P() { ctx.beginPath(); }
+function fs(fill, lw = 4, col = INK) {
+  if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  if (lw) { ctx.lineWidth = lw; ctx.strokeStyle = col; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.stroke(); }
+}
+function rr(x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+function el(x, y, rx, ry = rx) { ctx.moveTo(x + rx, y); ctx.ellipse(x, y, Math.abs(rx), Math.abs(ry), 0, 0, TAU); }
+function box(x, y, w, h, r, fill, lw = 4) { P(); rr(x, y, w, h, r); fs(fill, lw); }
+function oval(x, y, rx, ry, fill, lw = 4) { P(); el(x, y, rx, ry); fs(fill, lw); }
+function poly(pts, fill, lw = 4) {
+  P(); ctx.moveTo(pts[0], pts[1]);
+  for (let i = 2; i < pts.length; i += 2) ctx.lineTo(pts[i], pts[i + 1]);
+  ctx.closePath(); fs(fill, lw);
+}
+function line(x1, y1, x2, y2, lw = 4, c = INK) {
+  P(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.lineWidth = lw; ctx.strokeStyle = c; ctx.lineCap = 'round'; ctx.stroke();
+}
+function arc(x, y, r, a0, a1, lw = 4, c = INK) { P(); ctx.arc(x, y, r, a0, a1); fs(null, lw, c); }
+function text(s, x, y, size, color, o = {}) {
+  ctx.font = `${size}px ${o.font || FH}`;
+  ctx.textAlign = o.align || 'center'; ctx.textBaseline = o.base || 'middle';
+  if (o.stroke) { ctx.lineWidth = o.stroke; ctx.strokeStyle = o.sc || INK; ctx.lineJoin = 'round'; ctx.strokeText(s, x, y); }
+  ctx.fillStyle = color; ctx.fillText(s, x, y);
+}
+function wrap(s, maxW, size, font = FH) {
+  ctx.font = `${size}px ${font}`;
+  const out = []; let cur = '';
+  for (const w of s.split(' ')) {
+    const t = cur ? cur + ' ' + w : w;
+    if (ctx.measureText(t).width > maxW && cur) { out.push(cur); cur = w; } else cur = t;
+  }
+  if (cur) out.push(cur);
+  return out;
+}
+function withT(x, y, fn, sx = 1, sy = sx, rot = 0) {
+  ctx.save(); ctx.translate(x, y); if (rot) ctx.rotate(rot); ctx.scale(sx, sy); fn(); ctx.restore();
+}
+
+/* ---------- speech bubbles & narration captions ---------- */
+// kind: 'say' | 'shout' | 'think' ; (tx,ty) is who is talking
+function bubble(t, t0, t1, x, y, str, o = {}) {
+  if (t < t0 || t > t1) return;
+  const sc = eBack(prog(t, t0, t0 + .28)) * (1 - prog(t, t1 - .18, t1));
+  if (sc <= .02) return;
+  const size = o.size || 28, maxW = o.w || 320, kind = o.kind || 'say';
+  const lines = wrap(str, maxW - 40, size);
+  ctx.font = `${size}px ${FH}`;
+  const bw = Math.max(90, Math.max(...lines.map(l => ctx.measureText(l).width)) + 44);
+  const bh = lines.length * size * 1.1 + 28;
+  ctx.save(); ctx.translate(x, y); ctx.scale(sc, sc);
+  if (kind === 'shout') ctx.rotate(wob(x, .02));
+  const tx = o.tx != null ? o.tx - x : null, ty = o.ty != null ? o.ty - y : null;
+  const fill = o.fill || (kind === 'shout' ? '#FFE35A' : '#FFFDF6');
+  const bodyPath = () => {
+    if (kind === 'shout') {
+      const n = 22;
+      for (let i = 0; i <= n; i++) {
+        const a = i / n * TAU, rad = i % 2 ? 1 : 1.18;
+        const px = Math.cos(a) * (bw / 2 + 8) * rad, py = Math.sin(a) * (bh / 2 + 6) * rad;
+        i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+      }
+      ctx.closePath();
+    } else if (kind === 'think') {
+      el(0, 0, bw / 2 + 10, bh / 2 + 6);
+    } else rr(-bw / 2, -bh / 2, bw, bh, 22);
+  };
+  const tailPath = () => {
+    if (tx == null) return;
+    const d = Math.hypot(tx, ty) || 1, nx = -ty / d, ny = tx / d;
+    const tip = Math.min(1, (d - 30) / d);
+    if (kind === 'think') {
+      for (let i = 1; i <= 3; i++) { const f = .45 + i * .15; el(tx * f * tip, ty * f * tip, 12 - i * 3); }
+    } else {
+      ctx.moveTo(nx * 16, ny * 16); ctx.lineTo(tx * tip, ty * tip); ctx.lineTo(-nx * 16, -ny * 16); ctx.closePath();
+    }
+  };
+  P(); bodyPath(); tailPath(); fs(null, 8);
+  ctx.fillStyle = fill; P(); bodyPath(); ctx.fill(); P(); tailPath(); ctx.fill();
+  const lh = size * 1.1;
+  lines.forEach((l, i) => text(l, 0, (i - (lines.length - 1) / 2) * lh + 1, size, INK));
+  ctx.restore();
+}
+
+// yellow comic caption box, top-left
+function narr(t, t0, t1, str, o = {}) {
+  if (t < t0 || t > t1) return;
+  const a = eOut(prog(t, t0, t0 + .4)) * (1 - prog(t, t1 - .3, t1));
+  const size = o.size || 27, lines = wrap(str, (o.w || 600) - 36, size);
+  ctx.font = `${size}px ${FH}`;
+  const bw = Math.max(...lines.map(l => ctx.measureText(l).width)) + 36, bh = lines.length * size * 1.12 + 22;
+  const x = o.x ?? 34, y = (o.y ?? 30) - (1 - a) * 30;
+  ctx.save(); ctx.globalAlpha = a;
+  ctx.fillStyle = 'rgba(0,0,0,.25)'; P(); rr(x + 6, y + 6, bw, bh, 4); ctx.fill();
+  box(x, y, bw, bh, 4, o.fill || '#FFE27A', 4);
+  lines.forEach((l, i) => text(l, x + 18, y + 11 + size * .56 + i * size * 1.12, size, INK, { align: 'left' }));
+  ctx.restore();
+}
+
+/* ---------- small props & effects ---------- */
+function star5(x, y, r, fill, lw = 3, rot = 0) {
+  const p = [];
+  for (let i = 0; i < 10; i++) { const a = rot - PI / 2 + i * PI / 5, rad = i % 2 ? r * .45 : r; p.push(x + Math.cos(a) * rad, y + Math.sin(a) * rad); }
+  poly(p, fill, lw);
+}
+function paw(x, y, r, fill = INK) {
+  ctx.fillStyle = fill;
+  P(); el(x, y + r * .35, r * .62, r * .5); ctx.fill();
+  [[-.62, -.25], [-.22, -.62], [.22, -.62], [.62, -.25]].forEach(([a, b]) => { P(); el(x + a * r, y + b * r, r * .22, r * .27); ctx.fill(); });
+}
+function flag(x, y, h, t, w = 90, seed = 0) {
+  line(x, y, x, y - h, 5);
+  oval(x, y - h - 4, 6, 6, '#D9AE4E', 3);
+  const top = y - h + 6, fh = w * .62;
+  const wave = (u) => Math.sin(u * 4 - t * 6 + seed) * 6 * u;
+  const band = (v0, v1, col) => {
+    P();
+    for (let i = 0; i <= 10; i++) { const u = i / 10; ctx.lineTo(x + u * w, top + v0 * fh + wave(u)); }
+    for (let i = 10; i >= 0; i--) { const u = i / 10; ctx.lineTo(x + u * w, top + v1 * fh + wave(u)); }
+    ctx.closePath(); ctx.fillStyle = col; ctx.fill();
+  };
+  band(0, .5, '#2F8F83'); band(.5, 1, '#E8B33C');
+  paw(x + w * .5, top + fh * .5 + wave(.5), fh * .26, '#FFFDF6');
+  P();
+  for (let i = 0; i <= 10; i++) { const u = i / 10; ctx.lineTo(x + u * w, top + wave(u)); }
+  for (let i = 10; i >= 0; i--) { const u = i / 10; ctx.lineTo(x + u * w, top + fh + wave(u)); }
+  ctx.closePath(); fs(null, 3);
+}
+function cloud(x, y, s, c = '#FFFFFF') {
+  withT(x, y, () => {
+    P(); el(-40, 8, 34, 24); el(0, -6, 42, 34); el(42, 8, 32, 22); el(10, 16, 50, 20);
+    fs(c, 0);
+  }, s);
+}
+function splashDrops(cx, cy, k, seed = 1) {
+  for (let i = 0; i < 14; i++) {
+    const a = -PI / 2 + (hash(i + seed) - .5) * 2.2, v = 120 + hash(i * 7 + seed) * 220;
+    const x = cx + Math.cos(a) * v * k, y = cy + Math.sin(a) * v * k + 400 * k * k;
+    if (k < 1) oval(x, y, 7 * (1 - k * .5), 9 * (1 - k * .5), '#8FD3F0', 2);
+  }
+}
+function sparkle(x, y, r, t) { const s = .6 + .4 * Math.sin(t * 9 + x); star5(x, y, r * s, '#FFF3B0', 2, t); }
+</script>
+<script>
+/* ================= the cast ================= */
+const CAST = {
+  manit:  { id: 1, name: 'Manit',  skin: '#C68A5C', hair: 'neat',  hc: '#221613', top: '#5B3F8C', trim: '#E8B33C', pants: '#2E2A3A' },
+  aryan:  { id: 2, name: 'Aryan',  skin: '#D19A6A', hair: 'spiky', hc: '#2B1B14', top: '#D2483A', trim: '#FFD27A', pants: '#3A2F2A' },
+  abeer:  { id: 3, name: 'Abeer',  skin: '#BD8157', hair: 'swoop', hc: '#3A2418', top: '#3F7CC4', trim: '#F28DB2', pants: '#23324A' },
+  aadi:   { id: 4, name: 'Aadi',   skin: '#CF9466', hair: 'curly', hc: '#1D1411', top: '#4E9A4A', trim: '#F4F0E6', pants: '#3C3B35', glasses: true },
+  bholu:  { id: 5, name: 'Bholu',  skin: '#B97B52', hair: 'bald',  hc: '#6B6460', top: '#E0893A', trim: '#FFF1D6', pants: '#4A3A2E', stache: true },
+  chintu: { id: 6, name: 'Chintu', skin: '#D6A274', hair: 'buzz',  hc: '#2A1C16', top: '#E9C443', trim: '#C8553D', pants: '#3C4A5A', belly: .35 },
+};
+
+function prop(kind, t, o = {}) {
+  switch (kind) {
+    case 'chai':
+      poly([-10, -20, 10, -20, 7, 4, -7, 4], '#EFE3CC', 3);
+      poly([-8.6, -10, 8.6, -10, 7, 4, -7, 4], '#B5712F', 0);
+      for (let i = 0; i < 2; i++) { P(); ctx.moveTo(-4 + i * 8, -26); ctx.bezierCurveTo(-10 + i * 8, -34 - Math.sin(t * 4 + i) * 3, 2 + i * 8, -40, -4 + i * 8, -50); fs(null, 2.5, 'rgba(255,255,255,.8)'); }
+      break;
+    case 'calc':
+      box(-17, -30, 34, 46, 6, '#3B3F46', 3);
+      box(-13, -26, 26, 12, 2, '#B8D8A8', 2);
+      for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) box(-12 + c * 9, -9 + r * 8, 6, 5, 1, c === 2 && r === 2 ? '#E8743B' : '#D7D2C6', 0);
+      break;
+    case 'samosa':
+      poly([0, -22, 20, 10, -20, 10], '#E0A13A', 3);
+      [[-4, 0], [5, -6], [3, 5]].forEach(([a, b]) => oval(a, b, 2, 2, '#A8661E', 0));
+      break;
+    case 'invite':
+      ctx.rotate(-.2); box(-24, -34, 48, 32, 3, '#F2C94C', 3); star5(0, -18, 9, '#FFF6CF', 2); sparkle(22, -38, 7, t);
+      break;
+    case 'papers':
+      for (let i = 4; i >= 0; i--) box(-26 + i * 1.5, -40 - i * 6, 52, 34, 2, i ? '#F4EEE0' : '#FFFFFF', 2.5);
+      line(-16, -54, 14, -54, 2); line(-16, -46, 8, -46, 2);
+      break;
+    case 'ballot':
+      box(-16, -30, 32, 24, 2, '#FFFFFF', 3); line(-6, -24, 6, -12, 3, '#C8553D'); line(6, -24, -6, -12, 3, '#C8553D');
+      break;
+    case 'clip':
+      box(-22, -44, 44, 56, 4, '#A87B4F', 3); box(-17, -36, 34, 44, 2, '#FFFFFF', 2); box(-8, -48, 16, 8, 2, '#8C8C8C', 2);
+      for (let i = 0; i < 3; i++) {
+        box(-13, -30 + i * 13, 8, 8, 1, '#FFFFFF', 2); line(-1, -26 + i * 13, 12, -26 + i * 13, 2);
+        if (o.ticks > i) { line(-12, -26 + i * 13, -9, -23 + i * 13, 2.5, '#2F8F83'); line(-9, -23 + i * 13, -3, -33 + i * 13, 2.5, '#2F8F83'); }
+      }
+      break;
+    case 'fish':
+      P(); el(0, -8, 13, 7); ctx.moveTo(10, -8); ctx.lineTo(20, -15); ctx.lineTo(20, -1); ctx.closePath(); fs('#F09A4A', 2.5);
+      oval(-6, -9, 1.8, 1.8, INK, 0);
+      break;
+    case 'tray':
+      oval(0, -4, 44, 9, '#D9DDE3', 3);
+      withT(-14, -12, () => prop('chai', t));
+      withT(18, -8, () => prop('fish', t), .9);
+      break;
+  }
+}
+
+/* person(o): o.c = cast key, feet at (o.x,o.y); face, arms (raise in radians), walk phase, props */
+function person(o) {
+  const c = CAST[o.c], s = o.s || 1, id = c.id, t = o.t || 0;
+  const sw = o.walk != null ? Math.sin(o.walk) * .55 : 0;
+  const bob = (o.walk != null ? -Math.abs(Math.cos(o.walk)) * 5 : 0) + (o.bob || 0);
+  const belly = (c.belly || 0) + (o.belly || 0), bw = 60 + belly * 44;
+  ctx.save();
+  ctx.translate(o.x + wob(id, .7), o.y);
+  if (o.rot) ctx.rotate(o.rot);
+  ctx.scale(s * (o.flip ? -1 : 1), s * (o.squash || 1));
+  if (o.alpha != null) ctx.globalAlpha = o.alpha;
+  ctx.fillStyle = 'rgba(0,0,0,.18)'; P(); el(0, 3, 42 + belly * 22, 8); ctx.fill();
+
+  const leg = (x, a) => withT(x, -58 + bob, () => { box(-9, 0, 18, 54, 7, c.pants, 3.5); oval(5, 56, 15, 8, INK, 0); }, 1, 1, a);
+  leg(-13, sw); leg(13, -sw);
+  ctx.translate(0, bob);
+
+  const aL = o.armL ?? (.12 + sw * .7), aR = o.armR ?? (.12 - sw * .7);
+  const arm = (side, raise, pk) => withT(side * (bw / 2 - 6), -114, () => {
+    box(-8, -4, 16, 52, 8, c.top, 3.5);
+    oval(0, 52, 10, 10, c.skin, 3.5);
+    if (pk) withT(0, 56, () => prop(pk, t, o), 1, 1, -(side < 0 ? raise : -raise));
+  }, 1, 1, side < 0 ? raise : -raise);
+  arm(-1, aL, o.propL);
+
+  // torso
+  P(); rr(-bw / 2, -126, bw, 76, 24); fs(c.top, 4);
+  if (o.c === 'manit') { for (let i = 0; i < 4; i++) oval(0, -110 + i * 15, 3.5, 3.5, c.trim, 2); box(-14, -128, 28, 8, 3, c.trim, 2.5); }
+  else if (o.c === 'abeer') { poly([-8, -124, 8, -124, 5, -72, 0, -64, -5, -72], c.trim, 3); poly([-8, -126, 0, -114, 8, -126], '#FFFFFF', 2.5); }
+  else if (o.c === 'aadi') { poly([-12, -126, 0, -104, 12, -126], c.trim, 2.5); }
+  else { line(0, -124, 0, -98, 3, c.trim); oval(0, -112, 2.5, 2.5, c.trim, 0); }
+  if (o.wet) { ctx.fillStyle = 'rgba(40,110,170,.28)'; P(); rr(-bw / 2, -126, bw, 76, 24); ctx.fill(); }
+  if (o.sash) { P(); ctx.moveTo(-bw / 2 + 6, -120); ctx.lineTo(bw / 2 - 2, -60); ctx.lineTo(bw / 2 - 16, -54); ctx.lineTo(-bw / 2 + 2, -104); ctx.closePath(); fs('#E8B33C', 3); star5(4, -88, 8, '#FFFDF6', 2, .3); }
+  if (o.crumbs) for (let i = 0; i < 7; i++) oval(-bw / 3 + hash(i) * bw * .66, -100 + hash(i + 9) * 40, 2.5, 2, '#C98A2E', 0);
+  arm(1, aR, o.propR);
+
+  // head
+  withT(0, -154, () => {
+    ctx.rotate(o.tilt || 0);
+    if (c.hair === 'swoop') hairBack(c, t);
+    oval(-33, 4, 7, 10, c.skin, 3.5); oval(33, 4, 7, 10, c.skin, 3.5);
+    oval(0, 0, 34, 35, c.skin, 4);
+    face(o.face || 'smile', o.look || 0, c, t, o);
+    if (c.stache) { P(); ctx.moveTo(0, 8); ctx.bezierCurveTo(-10, 2, -24, 8, -26, 16); ctx.bezierCurveTo(-14, 14, -6, 16, 0, 12); ctx.bezierCurveTo(6, 16, 14, 14, 26, 16); ctx.bezierCurveTo(24, 8, 10, 2, 0, 8); fs(c.hc, 3); }
+    hair(c, t, o);
+    if (c.glasses) {
+      const gc = '#2A1C16'; oval(-12, -2, 11, 11, 'rgba(210,235,255,.25)', 3); oval(12, -2, 11, 11, 'rgba(210,235,255,.25)', 3); line(-1, -3, 1, -3, 3, gc);
+      if (o.crack) { P(); ctx.moveTo(4, -12); ctx.lineTo(10, -4); ctx.lineTo(7, 0); ctx.lineTo(15, 7); fs(null, 2); }
+    }
+    if (o.wet) { for (let i = 0; i < 3; i++) { const k = ((t * 1.4 + i / 3) % 1); oval(-20 + i * 20, 30 + k * 90, 3, 5, '#8FD3F0', 1.5); } P(); ctx.moveTo(-26, -24); ctx.quadraticCurveTo(-34, 10, -30, 36); fs(null, 5, '#4F8A3C'); }
+    if (o.duck) duck({ x: 4, y: -62, s: .55, t, quack: o.quack });
+    if (o.crown) crown(0, -42, 1);
+  });
+  if (o.tag) { const tw = 86; box(-tw / 2, 14, tw, 26, 5, '#E8C46A', 3); text(c.name, 0, 27, 20, INK); }
+  ctx.restore();
+}
+
+function hairBack(c, t) { P(); ctx.moveTo(-34, 6); ctx.quadraticCurveTo(-40, 24, -30, 30); ctx.lineTo(-24, 10); fs(c.hc, 3); }
+function hair(c, t, o) {
+  const hc = c.hc;
+  switch (c.hair) {
+    case 'neat':
+      P(); ctx.moveTo(-36, 4); ctx.bezierCurveTo(-42, -34, -18, -46, 4, -42); ctx.bezierCurveTo(30, -40, 42, -24, 36, 2);
+      ctx.quadraticCurveTo(30, -18, 12, -22); ctx.quadraticCurveTo(-8, -16, -22, -24); ctx.quadraticCurveTo(-30, -10, -36, 4); fs(hc, 3.5);
+      P(); ctx.moveTo(-8, -38); ctx.quadraticCurveTo(10, -38, 22, -28); fs(null, 2.5, 'rgba(255,255,255,.35)');
+      break;
+    case 'spiky': {
+      const p = [-36, 0, -38, -26];
+      for (let i = 0; i <= 6; i++) { p.push(-34 + i * 11.5, -58 - (i % 2) * 10 + Math.sin(i * 2) * 3, -28 + i * 11.5, -32); }
+      p.push(38, -24, 36, 0, 22, -20, -20, -20);
+      poly(p, hc, 3.5);
+      break;
+    }
+    case 'swoop':
+      P(); ctx.moveTo(-36, 2); ctx.bezierCurveTo(-48, -52, -8, -84, 34, -70); ctx.bezierCurveTo(62, -60, 52, -26, 36, -4);
+      ctx.quadraticCurveTo(22, -26, -4, -24); ctx.quadraticCurveTo(-26, -20, -36, 2); fs(hc, 3.5);
+      P(); ctx.moveTo(-18, -52); ctx.quadraticCurveTo(6, -72, 36, -60); fs(null, 4, 'rgba(255,255,255,.45)');
+      if (o.shine) { sparkle(44, -72, 10, t); sparkle(-30, -50, 7, t + 1); }
+      break;
+    case 'curly':
+      P(); for (let i = -3; i <= 3; i++) el(i * 11, -30 + Math.abs(i) * 4 - (i === 0 ? 6 : 0), 13, 12); el(-33, -8, 9, 12); el(33, -8, 9, 12); fs(hc, 3);
+      break;
+    case 'bald':
+      oval(-32, -6, 9, 13, hc, 3); oval(32, -6, 9, 13, hc, 3);
+      P(); ctx.arc(-8, -18, 12, PI * 1.1, PI * 1.6); fs(null, 3, 'rgba(255,255,255,.5)');
+      break;
+    case 'buzz':
+      P(); ctx.ellipse(0, -2, 35, 35, 0, PI * 1.02, PI * 1.98); ctx.quadraticCurveTo(0, -24, -35, -3); fs(hc, 3.5);
+      break;
+  }
+}
+
+function face(kind, look, c, t, o) {
+  const lx = look * 3.5;
+  const blink = !o.noBlink && hash(Math.floor(t * 1.1) + c.id * 13) > .7 && (t * 1.1 % 1) < .1;
+  const eyes = (rx = 8, ry = 10, pr = 4.5) => {
+    if (blink) { line(-18, -2, -6, -2, 3); line(6, -2, 18, -2, 3); return; }
+    oval(-12, -2, rx, ry, '#FFFFFF', 3); oval(12, -2, rx, ry, '#FFFFFF', 3);
+    oval(-12 + lx, 0, pr, pr, INK, 0); oval(12 + lx, 0, pr, pr, INK, 0);
+  };
+  const cheeks = () => { ctx.fillStyle = 'rgba(230,90,90,.28)'; P(); el(-22, 12, 7, 4); el(22, 12, 7, 4); ctx.fill(); };
+  switch (kind) {
+    case 'smile': eyes(); arc(0, 8, 12, .2 * PI, .8 * PI, 3.5); break;
+    case 'grin': eyes(); P(); ctx.moveTo(-16, 10); ctx.quadraticCurveTo(0, 36, 16, 10); ctx.closePath(); fs('#7A2E2E', 3); box(-9, 10, 18, 5, 1, '#FFFFFF', 0); break;
+    case 'shout': eyes(8, 10, 3.5); line(-20, -16, -6, -12, 4); line(20, -16, 6, -12, 4); oval(0, 18, 11, 12, '#7A2E2E', 3.5); oval(0, 24, 6, 4, '#E07A7A', 0); break;
+    case 'shock': eyes(10, 13, 3); line(-20, -20, -6, -18, 3); line(20, -20, 6, -18, 3); oval(0, 20, 7, 10, '#7A2E2E', 3.5); break;
+    case 'angry': eyes(8, 9, 4); line(-21, -17, -5, -9, 4.5); line(21, -17, 5, -9, 4.5); arc(0, 24, 10, 1.2 * PI, 1.8 * PI, 3.5); break;
+    case 'sly':
+      eyes(8, 9, 4);
+      if (!blink) { ctx.fillStyle = c.skin; P(); ctx.rect(-21, -13, 18, 10); ctx.rect(3, -13, 18, 10); ctx.fill(); line(-20, -3, -4, -3, 3); line(4, -3, 20, -3, 3); }
+      line(-20, -14, -6, -12, 3.5); line(6, -18, 20, -14, 3.5);
+      P(); ctx.moveTo(-10, 14); ctx.quadraticCurveTo(6, 20, 16, 6); fs(null, 3.5);
+      break;
+    case 'sad': eyes(8, 10, 4); line(-18, -12, -6, -17, 3.5); line(18, -12, 6, -17, 3.5); arc(0, 24, 10, 1.2 * PI, 1.8 * PI, 3.5); break;
+    case 'happy': arc(-12, 2, 7, 1.1 * PI, 1.9 * PI, 3.5); arc(12, 2, 7, 1.1 * PI, 1.9 * PI, 3.5); cheeks(); P(); ctx.moveTo(-14, 10); ctx.quadraticCurveTo(0, 30, 14, 10); ctx.closePath(); fs('#7A2E2E', 3); break;
+    case 'dizzy':
+      for (const ex of [-12, 12]) { P(); for (let a = 0; a < 12; a += .3) { const r = a * .75; ctx.lineTo(ex + Math.cos(a + t * 8) * r, -2 + Math.sin(a + t * 8) * r); } fs(null, 2.5); }
+      P(); ctx.moveTo(-12, 16); for (let i = 0; i <= 6; i++) ctx.lineTo(-12 + i * 4, 16 + (i % 2 ? -4 : 3)); fs(null, 3);
+      break;
+    case 'sleep': arc(-12, -2, 7, .1 * PI, .9 * PI, 3.5); arc(12, -2, 7, .1 * PI, .9 * PI, 3.5); oval(0, 18, 5, 4 + Math.sin(t * 2) * 2, '#7A2E2E', 3); break;
+    case 'chew': eyes(); oval(0, 16, 10, 3 + Math.abs(Math.sin(t * 10)) * 5, '#7A2E2E', 3); cheeks(); break;
+  }
+}
+
+function crown(x, y, s) {
+  withT(x, y, () => {
+    poly([-22, 6, -24, -18, -12, -6, 0, -24, 12, -6, 24, -18, 22, 6], '#F2C230', 3);
+    oval(0, -2, 4, 4, '#C8553D', 2); oval(-13, 0, 3, 3, '#2F8F83', 2); oval(13, 0, 3, 3, '#2F8F83', 2);
+  }, s);
+}
+
+function duck(o) {
+  withT(o.x, o.y, () => {
+    const b = Math.sin((o.t || 0) * 3) * 2;
+    P(); ctx.moveTo(-30, -6 + b); ctx.quadraticCurveTo(-34, 16, 0, 16); ctx.quadraticCurveTo(28, 16, 26, -2); ctx.quadraticCurveTo(10, 2, -30, -6 + b); fs('#F6D445', 3.5);
+    oval(18, -18, 14, 13, '#F6D445', 3.5);
+    const q = o.quack ? .6 : 0;
+    poly([30, -20, 46, -18 - q * 6, 31, -14], '#F08A2E', 3); if (q) poly([30, -14, 44, -8, 31, -12], '#F08A2E', 3);
+    oval(22, -21, 2.8, 2.8, INK, 0);
+    P(); ctx.moveTo(-10, 0); ctx.quadraticCurveTo(0, 8, 10, 0); fs(null, 3);
+  }, (o.flip ? -1 : 1) * o.s, o.s);
+}
+
+/* Churi, the Royal Cat */
+function cat(o) {
+  const C = '#8E90A6', D = '#5B5D75', Wt = '#F6F1E6', t = o.t || 0;
+  withT(o.x, o.y, () => {
+    ctx.fillStyle = 'rgba(0,0,0,.18)'; P(); el(0, 2, 50, 8); ctx.fill();
+    const tube = (fn, w) => { P(); fn(); fs(null, w + 7); P(); fn(); fs(null, w, C); };
+    if (o.pose === 'walk') {
+      const ph = o.walk || 0;
+      tube(() => { ctx.moveTo(-46, -46); ctx.bezierCurveTo(-80, -56, -84, -96 + Math.sin(t * 3) * 8, -66, -112); }, 10);
+      for (const [x, k] of [[-30, 0], [-18, PI], [28, PI], [40, 0]]) withT(x, -34, () => box(-6, 0, 12, 34, 6, x > 0 && k ? Wt : C, 3), 1, 1, Math.sin(ph + k) * .4);
+      oval(0, -46, 56, 26, C, 4);
+      for (let i = 0; i < 3; i++) line(-20 + i * 16, -70, -24 + i * 16, -56, 3.5, D);
+      catHead(56, -72, o, C, D, Wt);
+    } else {
+      tube(() => { ctx.moveTo(24, -10); ctx.bezierCurveTo(60, -6, 62, -40, 48, -58 + Math.sin(t * 2.5) * 6); }, 10);
+      P(); ctx.moveTo(-34, 0); ctx.bezierCurveTo(-42, -60, -24, -86, 0, -86); ctx.bezierCurveTo(24, -86, 42, -60, 34, 0); ctx.closePath(); fs(C, 4);
+      oval(0, -40, 17, 28, Wt, 0);
+      for (let i = 0; i < 3; i++) line(-30, -60 + i * 14, -20, -56 + i * 14, 3.5, D);
+      oval(-13, -4, 12, 8, Wt, 3.5); oval(13, -4, 12, 8, Wt, 3.5);
+      catHead(0, -100, o, C, D, Wt);
+    }
+  }, (o.flip ? -1 : 1) * (o.s || 1), o.s || 1);
+}
+function catHead(x, y, o, C, D, Wt) {
+  withT(x, y, () => {
+    poly([-28, -8, -24, -40, -6, -22], C, 3.5); poly([28, -8, 24, -40, 6, -22], C, 3.5);
+    poly([-23, -14, -21, -32, -11, -20], '#F2A7B0', 0); poly([23, -14, 21, -32, 11, -20], '#F2A7B0', 0);
+    oval(0, 0, 32, 27, C, 4);
+    line(-6, -26, -4, -16, 3, D); line(6, -26, 4, -16, 3, D);
+    oval(0, 10, 12, 8, Wt, 0);
+    if (o.face === 'smug') { arc(-12, -1, 7, .05 * PI, .95 * PI, 3.5); arc(12, -1, 7, .05 * PI, .95 * PI, 3.5); }
+    else { oval(-12, -2, 7.5, 8.5, '#B6D96A', 3); oval(12, -2, 7.5, 8.5, '#B6D96A', 3); oval(-12, -2, 2.4, 7, INK, 0); oval(12, -2, 2.4, 7, INK, 0); }
+    poly([-4, 6, 4, 6, 0, 11], '#E77C8E', 2);
+    if (o.meow) oval(0, 18, 6, 5 + o.meow * 3, '#7A2E2E', 3);
+    else { arc(-4, 12, 4, 0, PI, 2.5); arc(4, 12, 4, 0, PI, 2.5); }
+    for (const sd of [-1, 1]) for (let i = 0; i < 2; i++) line(sd * 14, 8 + i * 5, sd * 40, 4 + i * 10, 2);
+    if (o.crown) crown(0, -30, .8);
+  });
+}
+</script>
+<script>
+/* ================= places of Manit Land ================= */
+const STONE = '#EBD3AA', STONE_D = '#CFAF83', COL = '#F7ECD4', PATINA = '#5FA89A', GRASS = '#7DBB5A', GRASS_D = '#5E9E45';
+
+function sky(c1, c2, y1 = H) { const g = ctx.createLinearGradient(0, 0, 0, y1); g.addColorStop(0, c1); g.addColorStop(1, c2); ctx.fillStyle = g; ctx.fillRect(-200, -200, W + 400, H + 400); }
+function sun(x, y, r, t) {
+  ctx.save(); ctx.globalAlpha = .35;
+  for (let i = 0; i < 12; i++) { const a = i / 12 * TAU + t * .15; line(x + Math.cos(a) * (r + 14), y + Math.sin(a) * (r + 14), x + Math.cos(a) * (r + 40), y + Math.sin(a) * (r + 40), 6, '#FFE9A0'); }
+  ctx.restore(); oval(x, y, r, r, '#FFD65C', 4);
+}
+function hills(y, col, amp, seed, lw = 4) {
+  P(); ctx.moveTo(-200, H + 200); ctx.lineTo(-200, y);
+  for (let x = -200; x <= W + 200; x += 40) ctx.lineTo(x, y - Math.sin(x * .004 + seed) * amp - Math.sin(x * .011 + seed * 2) * amp * .4);
+  ctx.lineTo(W + 200, H + 200); ctx.closePath(); fs(col, lw);
+}
+function ground(y, col = GRASS) { box(-200, y, W + 400, H - y + 200, 0, col, 4); }
+function tree(x, y, s = 1, col = '#4E9A4A') {
+  withT(x, y, () => { box(-8, -60, 16, 62, 4, '#8A5A36', 3.5); P(); el(-22, -80, 28, 26); el(20, -84, 30, 28); el(0, -110, 32, 30); fs(col, 4); }, s);
+}
+function bush(x, y, s = 1) { withT(x, y, () => { P(); el(-18, -12, 20, 16); el(14, -14, 22, 18); el(0, -24, 20, 16); fs(GRASS_D, 3.5); }, s); }
+function pigeon(x, y, s, t, crowned) {
+  withT(x, y, () => {
+    const f = Math.sin(t * 16) * .8;
+    oval(0, 0, 16, 10, '#B9BCC8', 3); oval(14, -8, 8, 8, '#B9BCC8', 3); poly([21, -9, 28, -7, 21, -5], '#E8A04A', 2);
+    P(); ctx.moveTo(-4, -4); ctx.lineTo(-14, -4 - 18 * f); ctx.lineTo(6, -4); fs('#9EA1AE', 3);
+    if (crowned) crown(14, -18, .35);
+  }, s);
+}
+
+function columns(x0, x1, yTop, yBot, n, w = 26) {
+  for (let i = 0; i < n; i++) {
+    const x = lerp(x0, x1, i / (n - 1));
+    box(x - w / 2 - 6, yTop, w + 12, 12, 2, COL, 3); box(x - w / 2, yTop + 12, w, yBot - yTop - 24, 2, COL, 3);
+    box(x - w / 2 - 6, yBot - 12, w + 12, 12, 2, COL, 3);
+    line(x - 4, yTop + 18, x - 4, yBot - 18, 2, 'rgba(0,0,0,.12)'); line(x + 5, yTop + 18, x + 5, yBot - 18, 2, 'rgba(0,0,0,.12)');
+  }
+}
+function archWindows(x, y, n, gap, w = 26, h = 44, col = '#3E5A6E') {
+  for (let i = 0; i < n; i++) { const cx = x + i * gap; P(); ctx.moveTo(cx - w / 2, y + h); ctx.lineTo(cx - w / 2, y + w / 2); ctx.arc(cx, y + w / 2, w / 2, PI, 0); ctx.lineTo(cx + w / 2, y + h); ctx.closePath(); fs(col, 3); }
+}
+function dome(x, y, rx, ry, col, ribs = 6) {
+  P(); ctx.ellipse(x, y, rx, ry, 0, PI, TAU); ctx.closePath(); fs(col, 4);
+  for (let i = 1; i < ribs; i++) { const u = i / ribs * 2 - 1; P(); ctx.ellipse(x, y, Math.abs(u) * rx, ry, 0, u < 0 ? PI : PI * 1.5, u < 0 ? PI * 1.5 : TAU); fs(null, 2, 'rgba(0,0,0,.25)'); }
+  P(); ctx.ellipse(x - rx * .35, y - ry * .55, rx * .12, ry * .25, -.5, 0, TAU); ctx.fillStyle = 'rgba(255,255,255,.3)'; ctx.fill();
+}
+
+/* The Grand Parliament of Manit Land, base-centred at (x,y) */
+function parliament(x, y, s, t) {
+  withT(x, y, () => {
+    // central drum + dome + lantern + flag
+    box(-140, -440, 280, 80, 4, STONE, 4); archWindows(-110, -428, 6, 44, 20, 40, '#34506A');
+    dome(0, -440, 160, 150, PATINA, 8);
+    box(-20, -628, 40, 42, 4, COL, 3.5); dome(0, -628, 24, 24, PATINA, 3);
+    flag(0, -652, 70, t, 86, 1);
+    // wings
+    for (const sd of [-1, 1]) {
+      const wx = sd < 0 ? -470 : 190;
+      box(wx, -280, 280, 230, 4, STONE, 4);
+      box(wx - 8, -296, 296, 20, 3, STONE_D, 3.5);
+      archWindows(wx + 34, -240, 6, 42, 24, 50); archWindows(wx + 34, -150, 6, 42, 24, 50);
+      box(wx + 110, -318, 60, 22, 3, STONE, 3); dome(wx + 140, -318, 44, 38, PATINA, 4);
+      line(wx + 140, -356, wx + 140, -380, 4); oval(wx + 140, -384, 5, 5, '#E8B33C', 2);
+    }
+    // portico
+    box(-230, -300, 460, 40, 3, STONE, 4);
+    text('MANIT LAND PARLIAMENT', 0, -279, 25, INK, { font: FT });
+    poly([-250, -300, 0, -392, 250, -300], STONE, 4);
+    poly([-200, -308, 0, -378, 200, -308], STONE_D, 3);
+    oval(0, -334, 26, 26, '#E8B33C', 3.5); paw(0, -334, 14, INK);
+    box(-220, -260, 440, 210, 0, '#C9AD86', 3);
+    for (let i = 0; i < 3; i++) { const dx = -110 + i * 110; P(); ctx.moveTo(dx - 30, -50); ctx.lineTo(dx - 30, -150); ctx.arc(dx, -150, 30, PI, 0); ctx.lineTo(dx + 30, -50); ctx.closePath(); fs('#6B3F2A', 3.5); }
+    columns(-200, 200, -260, -50, 8);
+    // base + steps
+    box(-490, -56, 980, 20, 2, STONE_D, 4);
+    for (let i = 0; i < 4; i++) box(-280 + i * 20, -36 + i * 12, 560 - i * 40, 14, 1, i % 2 ? STONE : COL, 3);
+  }, s);
+}
+
+/* Manit Bhavan, the Presidential House */
+function presHouse(x, y, s, t) {
+  const WH = '#FBF6EC', PINK = '#E7B39A', ROSE = '#D98E48';
+  withT(x, y, () => {
+    for (const sd of [-1, 1]) {
+      const wx = sd < 0 ? -560 : 250;
+      box(wx, -210, 310, 160, 4, WH, 4); box(wx, -60, 310, 16, 0, PINK, 3);
+      archWindows(wx + 30, -180, 7, 42, 22, 44, '#5A7F9A'); archWindows(wx + 30, -116, 7, 42, 22, 44, '#5A7F9A');
+      box(wx - 6, -224, 322, 16, 3, PINK, 3.5);
+      for (const k of [60, 250]) { box(wx + k - 16, -262, 32, 38, 3, WH, 3); columns(wx + k - 12, wx + k + 12, -262, -224, 2, 6); dome(wx + k, -262, 26, 22, ROSE, 3); }
+    }
+    box(-250, -300, 500, 250, 4, WH, 4);
+    box(-250, -60, 500, 16, 0, PINK, 3);
+    box(-150, -410, 300, 110, 4, WH, 4); archWindows(-120, -390, 6, 48, 22, 44, '#5A7F9A');
+    dome(0, -410, 175, 160, ROSE, 8);
+    box(-16, -600, 32, 34, 3, WH, 3); dome(0, -600, 20, 18, ROSE, 3);
+    flag(0, -620, 60, t, 76, 2.4);
+    box(-262, -316, 524, 20, 3, PINK, 3.5);
+    box(-190, -296, 380, 30, 3, WH, 3.5);
+    text('MANIT BHAVAN', 0, -281, 22, INK, { font: FT });
+    columns(-176, 176, -266, -54, 10, 22);
+    box(-60, -170, 120, 116, 3, '#6B3F2A', 3.5); line(0, -170, 0, -54, 3);
+    box(-300, -44, 600, 16, 1, PINK, 3.5); box(-260, -28, 520, 16, 1, WH, 3);
+  }, s);
+}
+
+function chamber(t, crowdMood = 0) {
+  const g = ctx.createLinearGradient(0, 0, 0, 440); g.addColorStop(0, '#6E3F2C'); g.addColorStop(1, '#9A5B3C'); ctx.fillStyle = g; ctx.fillRect(-100, -100, W + 200, 560);
+  for (let i = 0; i < 6; i++) { const x = 120 + i * 208; P(); ctx.moveTo(x - 62, 440); ctx.lineTo(x - 62, 150); ctx.arc(x, 150, 62, PI, 0); ctx.lineTo(x + 62, 440); ctx.closePath(); fs('#2E4E45', 4); }
+  // portrait of Her Royal Fluffiness (foreshadowing)
+  box(560, 70, 160, 190, 6, '#C99A3E', 5); box(576, 86, 128, 158, 3, '#EDE1C7', 3);
+  withT(640, 238, () => cat({ x: 0, y: 0, s: .72, t, face: 'smug', crown: true }));
+  box(588, 262, 104, 26, 4, '#C99A3E', 3); text('HER FLUFFINESS', 640, 275, 15, INK);
+  // chandelier
+  const sw = Math.sin(t * 1.2) * .05;
+  withT(640, -10, () => {
+    line(0, 0, 0, 40, 4); P(); ctx.ellipse(0, 50, 70, 16, 0, 0, PI); fs('#D9AE4E', 4);
+    for (let i = -3; i <= 3; i++) { box(i * 20 - 3, 30, 6, 16, 2, '#FFF6D8', 2); oval(i * 20, 26, 4, 6, '#FFC84A', 0); }
+  }, 1, 1, sw);
+  // floor + curved benches
+  box(-100, 420, W + 200, 400, 0, '#8E2F2F', 4);
+  for (let r = 0; r < 3; r++) {
+    const y = 470 + r * 70, c = r % 2 ? '#2F6B52' : '#347A5D';
+    P(); ctx.ellipse(640, y - 190, 760 - r * 30, 200, 0, .08 * PI, .92 * PI); ctx.lineWidth = 34; ctx.strokeStyle = INK; ctx.stroke();
+    P(); ctx.ellipse(640, y - 190, 760 - r * 30, 200, 0, .08 * PI, .92 * PI); ctx.lineWidth = 27; ctx.strokeStyle = c; ctx.stroke();
+  }
+}
+function podium(x, y, label) {
+  box(x - 70, y - 110, 140, 110, 6, '#7A4A2E', 4); box(x - 80, y - 122, 160, 16, 4, '#9C6440', 3.5);
+  oval(x, y - 60, 22, 22, '#D9AE4E', 3); paw(x, y - 60, 12);
+  line(x + 40, y - 122, x + 52, y - 160, 3); oval(x + 54, y - 166, 6, 8, '#333', 2);
+  if (label) text(label, x, y - 20, 18, '#F3EAD6');
+}
+
+function pondScene(t) {
+  sky('#8FD0F2', '#DDF3FB', 420); sun(1120, 110, 50, t);
+  cloud(300 + t * 8 % 200, 110, 1); cloud(760 - t * 5 % 120, 70, .8);
+  hills(420, '#9CCB6B', 40, 2); ground(470);
+  tree(80, 490, 1.2); tree(1180, 480, 1); bush(420, 490, 1); bush(980, 486, .9);
+  P(); ctx.ellipse(860, 620, 380, 90, 0, 0, TAU); fs('#4FA8D8', 5);
+  P(); ctx.ellipse(840, 606, 300, 58, 0, 0, TAU); ctx.fillStyle = 'rgba(255,255,255,.14)'; ctx.fill();
+  for (let i = 0; i < 5; i++) { const x = 700 + i * 90, y = 590 + (i % 2) * 50; arc(x, y, 18, 1.15 * PI, 1.85 * PI, 2.5, 'rgba(255,255,255,.7)'); }
+  for (const [x, y] of [[640, 672], [1080, 590], [990, 676]]) { P(); ctx.ellipse(x, y, 26, 10, 0, .2, TAU - .2); ctx.lineTo(x, y); ctx.closePath(); fs('#5FAE4A', 3); }
+  for (let i = 0; i < 7; i++) { const x = 1170 + i * 12; line(x, 640, x + Math.sin(t * 2 + i) * 6, 560 + (i % 3) * 14, 5, '#4F8A3C'); }
+  // the "stage": a diving board over the pond
+  box(470, 610, 16, 56, 2, '#8A5A36', 3); box(600, 610, 16, 56, 2, '#8A5A36', 3);
+  box(360, 598, 300, 18, 4, '#C7925C', 4);
+  // sign
+  line(300, 600, 300, 470, 7); poly([200, 440, 420, 440, 450, 472, 420, 504, 200, 504], '#F2C94C', 4);
+  text('ELECTION STAGE', 318, 473, 26, INK, { font: FT });
+}
+
+function corridor(t, doorOpen = 0) {
+  ctx.fillStyle = '#E9D7B4'; ctx.fillRect(-100, -100, W + 200, H + 200);
+  for (let x = -100; x < W + 100; x += 60) box(x, -100, 30, 620, 0, '#E1CBA2', 0);
+  box(-100, 380, W + 200, 30, 0, '#8A5A36', 4); box(-100, 520, W + 200, 300, 0, '#A8683F', 4);
+  for (let x = -100; x < W + 100; x += 90) line(x, 520, x + 40, 720, 2, 'rgba(0,0,0,.15)');
+  // portrait of the Royal Cat again
+  box(120, 120, 130, 160, 5, '#C99A3E', 4); box(134, 134, 102, 132, 3, '#EDE1C7', 3); withT(185, 256, () => cat({ x: 0, y: 0, s: .55, t, face: 'smug' }));
+  // VIP door
+  box(700, 150, 260, 380, 6, '#5A2E22', 5);
+  box(712, 162, 236, 368, 4, '#1B1411', 3);
+  withT(712, 162, () => { box(0, 0, 236, 368, 4, '#8A3F2C', 4); box(24, 30, 188, 130, 6, '#9C4A34', 3); box(24, 190, 188, 150, 6, '#9C4A34', 3); oval(206, 190, 10, 10, '#E8B33C', 3); }, 1 - doorOpen * .85, 1);
+  box(650, 36, 360, 96, 8, '#F2C94C', 4);
+  text('VIP LOUNGE', 830, 70, 34, INK, { font: FT });
+  text('Free samosas. Great hair only.', 830, 108, 24, INK);
+}
+
+function samosaRoom(t, eaten) {
+  ctx.fillStyle = '#F4C66A'; ctx.fillRect(-100, -100, W + 200, H + 200);
+  for (let i = 0; i < 14; i++) { const a = i / 14 * TAU + t * .2; P(); ctx.moveTo(640, 360); ctx.arc(640, 360, 1200, a, a + .12); ctx.closePath(); ctx.fillStyle = 'rgba(255,255,255,.18)'; ctx.fill(); }
+  box(-100, 560, W + 200, 300, 0, '#C9763E', 4);
+  // the mountain
+  for (let r = 0; r < 8; r++) for (let c = 0; c <= r; c++) {
+    const x = 890 - r * 30 + c * 60, y = 330 + r * 34;
+    withT(x, y, () => prop('samosa', t), 1.3, 1.3, (hash(r * 9 + c) - .5) * .5);
+  }
+  box(80, 60, 330, 120, 8, '#FFFDF6', 4);
+  text('ELECTION RESULTS', 245, 94, 26, INK, { font: FT });
+  text(`after ${Math.max(0, 999 - eaten)} more samosas`, 245, 140, 28, '#C8553D');
+}
+
+function office(t, pigeonOn) {
+  ctx.fillStyle = '#CFE0D2'; ctx.fillRect(-100, -100, W + 200, H + 200);
+  for (let y = -100; y < 480; y += 40) line(-100, y, W + 100, y, 2, 'rgba(0,0,0,.05)');
+  // window
+  box(850, 70, 300, 250, 6, '#8A5A36', 5); withT(0, 0, () => { ctx.save(); P(); rr(866, 86, 268, 218, 3); ctx.clip(); sky('#8FD0F2', '#DDF3FB', 320); cloud(960, 150, .7); hills(290, '#9CCB6B', 20, 1, 3); if (pigeonOn) pigeon(1010, 230 + Math.sin(t * 3) * 6, 1.6, t, true); ctx.restore(); });
+  line(1000, 86, 1000, 304, 5); line(866, 195, 1134, 195, 5);
+  box(-100, 480, W + 200, 300, 0, '#9C6C45', 4);
+  // chart on wall
+  box(120, 80, 220, 170, 4, '#FFFDF6', 4);
+  for (let i = 0; i < 4; i++) box(150 + i * 44, 220 - (i + 1) * 30, 28, (i + 1) * 30, 2, ['#D2483A', '#3F7CC4', '#4E9A4A', '#5B3F8C'][i], 3);
+  text('VOTES (probably)', 230, 104, 22, INK);
+}
+
+function presOffice(t) {
+  ctx.fillStyle = '#2E4E45'; ctx.fillRect(-100, -100, W + 200, H + 200);
+  for (let x = -100; x < W + 100; x += 80) box(x, -100, 40, 600, 0, '#335649', 0);
+  box(320, 50, 640, 380, 8, '#C99A3E', 6);
+  ctx.save(); P(); rr(336, 66, 608, 348, 4); ctx.clip();
+  sky('#1B2548', '#5B4A7A', 420);
+  for (let i = 0; i < 20; i++) oval(340 + hash(i) * 600, 80 + hash(i + 40) * 200, 1.8, 1.8, '#FFF6D8', 0);
+  withT(640, 420, () => presHouse(0, 0, .5, t));
+  ctx.restore();
+  line(640, 66, 640, 414, 6, '#C99A3E');
+  flag(1080, 520, 300, t, 110, 3);
+  box(1060, 510, 40, 20, 3, '#6B3F2A', 3);
+  box(-100, 500, W + 200, 300, 0, '#7A2A2A', 4);
+}
+
+function bigChair(x, y, s) {
+  withT(x, y, () => {
+    P(); ctx.moveTo(-90, 0); ctx.lineTo(-90, -300); ctx.quadraticCurveTo(0, -370, 90, -300); ctx.lineTo(90, 0); ctx.closePath(); fs('#B23A3A', 5);
+    P(); ctx.moveTo(-70, -20); ctx.lineTo(-70, -280); ctx.quadraticCurveTo(0, -335, 70, -280); ctx.lineTo(70, -20); ctx.closePath(); fs('#C84848', 3);
+    oval(0, -330, 18, 18, '#E8B33C', 3.5); paw(0, -330, 10);
+    box(-110, -110, 220, 40, 10, '#A33434', 4); box(-120, -150, 30, 80, 8, '#E8B33C', 3.5); box(90, -150, 30, 80, 8, '#E8B33C', 3.5);
+  }, s);
+}
+function desk(x, y, w, col = '#7A4A2E') { box(x - w / 2, y - 120, w, 20, 4, '#9C6440', 4); box(x - w / 2 + 14, y - 100, w - 28, 100, 4, col, 4); }
+
+function blueprint(t) {
+  ctx.fillStyle = '#1F4E86'; ctx.fillRect(-100, -100, W + 200, H + 200);
+  for (let x = 0; x <= W; x += 40) line(x, 0, x, H, 1.5, 'rgba(255,255,255,.14)');
+  for (let y = 0; y <= H; y += 40) line(0, y, W, y, 1.5, 'rgba(255,255,255,.14)');
+  text('OPERATION: PRESIDENT', 470, 70, 46, '#FFFDF6', { font: FT });
+}
+function polaroid(x, y, rot, who, note, t, crossed) {
+  withT(x, y, () => {
+    box(-90, -110, 180, 210, 3, '#FFFDF6', 4);
+    ctx.save(); P(); rr(-76, -96, 152, 140, 2); fs('#BFDDEB', 3); ctx.clip();
+    person({ c: who, x: 0, y: 160, s: 1.2, t, face: who === 'aryan' ? 'shout' : who === 'abeer' ? 'grin' : 'smile', noBlink: true, shine: who === 'abeer' });
+    ctx.restore();
+    text(note, 0, 74, 25, INK);
+    oval(0, -104, 9, 9, '#D2483A', 3);
+    if (crossed) { const k = crossed; line(-80, -90, lerp(-80, 80, k), lerp(-90, 40, k), 9, '#D2483A'); if (k > .5) line(80, -90, lerp(80, -80, (k - .5) * 2), lerp(-90, 40, (k - .5) * 2), 9, '#D2483A'); }
+  }, 1, 1, rot);
+}
+
+function burst(x, y, k, col, n = 16, R = 120) {
+  if (k <= 0 || k >= 1) return;
+  ctx.save(); ctx.globalAlpha = 1 - k * k;
+  for (let i = 0; i < n; i++) { const a = i / n * TAU, r = eOut(k) * R; line(x + Math.cos(a) * r * .6, y + Math.sin(a) * r * .6 + k * 30, x + Math.cos(a) * r, y + Math.sin(a) * r + k * 40, 5, col); }
+  ctx.restore();
+}
+function crowd(y, n, t, cheer = 0) {
+  const cols = ['#D2483A', '#3F7CC4', '#4E9A4A', '#E9C443', '#5B3F8C', '#E0893A', '#2F8F83'];
+  for (let i = 0; i < n; i++) {
+    const x = -30 + i * (W + 60) / (n - 1), j = hash(i * 3.3), hop = cheer * Math.abs(Math.sin(t * 7 + i)) * 12;
+    box(x - 20, y - 30 - hop, 40, 60, 16, cols[i % cols.length], 3.5);
+    oval(x, y - 50 - hop, 18, 18, ['#C68A5C', '#D6A274', '#B97B52', '#8C5A3A'][i % 4], 3.5);
+    if (cheer && j > .4) line(x + 16, y - 20 - hop, x + 30, y - 70 - hop, 7, INK);
+  }
+}
+</script>
+<script>
+/* ================= scenes, part 1 ================= */
+function mixC(a, b, k) {
+  const pa = [1, 3, 5].map(i => parseInt(a.slice(i, i + 2), 16)), pb = [1, 3, 5].map(i => parseInt(b.slice(i, i + 2), 16));
+  return '#' + pa.map((v, i) => Math.round(lerp(v, pb[i], k)).toString(16).padStart(2, '0')).join('');
+}
+function track(lt, keys) {
+  if (lt <= keys[0][0]) return { x: keys[0][1], y: keys[0][2], m: false };
+  for (let i = 0; i < keys.length - 1; i++) {
+    const a = keys[i], b = keys[i + 1];
+    if (lt <= b[0]) { const k = (lt - a[0]) / (b[0] - a[0]); return { x: lerp(a[1], b[1], k), y: lerp(a[2], b[2], k), m: a[1] !== b[1] || a[2] !== b[2] }; }
+  }
+  const l = keys[keys.length - 1]; return { x: l[1], y: l[2], m: false };
+}
+function cam(cx, cy, z) { ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-cx, -cy); }
+function zzz(x, y, t) {
+  for (let i = 0; i < 3; i++) { const k = (t * .6 + i / 3) % 1; ctx.save(); ctx.globalAlpha = 1 - k; text('Z', x + k * 40 + Math.sin(k * 6) * 8, y - k * 90, 22 + k * 18, '#FFFDF6', { font: FT, stroke: 6 }); ctx.restore(); }
+}
+function birds(t, y0, n = 4) {
+  for (let i = 0; i < n; i++) {
+    const x = ((t * 60 + i * 180) % 1600) - 160, y = y0 + i * 18 + Math.sin(t + i) * 8, f = Math.sin(t * 8 + i) * 8;
+    P(); ctx.moveTo(x - 14, y - f); ctx.quadraticCurveTo(x - 6, y - 6, x, y); ctx.quadraticCurveTo(x + 6, y - 6, x + 14, y - f); fs(null, 3);
+  }
+}
+function whoosh(x, y, w, dir = 1) { for (let i = 0; i < 4; i++) line(x - dir * (20 + i * 10), y - 60 + i * 30, x - dir * (w + i * 10), y - 60 + i * 30, 4, 'rgba(42,28,22,.55)'); }
+
+/* 0 — Title: sunrise over Manit Land (0–9s) */
+function s0(lt, t) {
+  const d = ep(lt, 0, 6);
+  sky(mixC('#F59A6B', '#7EC6EE', d), mixC('#FFE0A8', '#E4F5FB', d), 520);
+  sun(1030, lerp(470, 150, eOut(prog(lt, 0, 5))), 58, t);
+  cloud(200 + lt * 10, 150, 1.1); cloud(760 - lt * 6, 90, .8);
+  birds(t, 180, 3);
+  hills(450, '#A9CF84', 30, 4);
+  parliament(380, 470, .2, t); presHouse(930, 470, .16, t);
+  hills(540, '#8CC263', 26, 1.3); ground(625, GRASS);
+  flag(96, 700, 360, t, 170, 0);
+  cat({ x: 250, y: 694, s: .55, t, face: 'smug' });
+  // title letters drop in
+  const word = 'MANIT LAND', size = 116;
+  ctx.font = `${size}px ${FT}`;
+  const widths = [...word].map(ch => ctx.measureText(ch).width), total = widths.reduce((a, b) => a + b, 0);
+  let x = 640 - total / 2;
+  [...word].forEach((ch, i) => {
+    const k = eBack(prog(lt, .9 + i * .1, 1.5 + i * .1));
+    const y = lerp(-120, 250, k) + Math.sin(t * 2 + i * .6) * 4;
+    if (k > 0) text(ch, x + widths[i] / 2, y, size, i < 5 ? '#FFE27A' : '#FFFDF6', { font: FT, stroke: 14 });
+    x += widths[i];
+  });
+  const a2 = eBack(prog(lt, 2.6, 3.1));
+  if (a2 > 0) withT(640, 356, () => text('How Manit Khatri became President', 0, 0, 46, '#FFFDF6', { stroke: 9 }), a2);
+  const a3 = eBack(prog(lt, 3.6, 4.1));
+  if (a3 > 0) withT(640, 410, () => text('(by fooling absolutely everyone)', 0, 0, 34, '#FFE27A', { stroke: 8 }), a3, a3, -.03);
+}
+
+/* 1 — The Grand Parliament (9–20s) */
+function s1(lt, t) {
+  ctx.save();
+  cam(640, 380, lerp(.9, 1.04, ep(lt, 0, 11)));
+  sky('#86CBEF', '#E4F5FB', 520); sun(1160, 90, 44, t);
+  cloud(100 + lt * 12, 120, 1); cloud(1000 - lt * 8, 70, .7);
+  hills(470, '#A9CF84', 25, 1); ground(560);
+  tree(80, 575, 1.3); tree(1200, 575, 1.3); bush(250, 575); bush(1040, 575);
+  parliament(640, 592, .74, t);
+  for (let i = 0; i < 5; i++) pigeon(((lt * 130 + i * 300) % 1700) - 200, 120 + i * 26 + Math.sin(t * 3 + i) * 10, .7, t + i, false);
+  const m = track(lt, [[4.4, -140, 712], [9.6, 560, 712]]);
+  person({ c: 'manit', x: m.x, y: m.y, s: 1.08, t, walk: m.m ? lt * 9 : undefined, propR: 'papers', propL: 'chai', armR: .45, armL: .35, face: lt > 9.8 ? 'sly' : 'smile', look: lt > 9.8 ? 0 : 1 });
+  ctx.restore();
+  narr(lt, .3, 5.2, 'Manit Land had a Grand Parliament, ninety-nine fountains, five ministers who wanted to be President… and no President.');
+  narr(lt, 5.4, 11, 'And then there was Manit Khatri. Junior Minister of Paperwork. Nobody ever noticed him. That was the plan.');
+}
+
+/* 2 — Inside the chamber: everybody wants the chair (20–36s) */
+function s2(lt, t) {
+  ctx.save();
+  const zk = ep(lt, 12.2, 13.8);
+  cam(lerp(640, 1000, zk), lerp(360, 420, zk), lerp(1, 1.7, zk));
+  chamber(t);
+  const who = lt < 4 ? 'aryan' : lt < 7.5 ? 'abeer' : lt < 10.8 ? 'aadi' : lt < 12.5 ? 'chintu' : 'manit';
+  const at = { aryan: 330, abeer: 540, aadi: 760, chintu: 960, manit: 1160 }[who];
+  const L = x => clamp((at - x) / 160, -1, 1);
+  person({ c: 'bholu', x: 130, y: 610, t, face: 'sleep', tilt: .15, tag: true });
+  zzz(160, 420, t);
+  person({ c: 'aryan', x: 330 + (who === 'aryan' ? wob(5, 4) : 0), y: 610, t, face: who === 'aryan' ? 'shout' : 'angry', armR: who === 'aryan' ? 2.5 + Math.sin(t * 10) * .3 : .2, armL: who === 'aryan' ? .7 : .2, look: L(330), tag: true });
+  person({ c: 'abeer', x: 540, y: 610, t, face: who === 'abeer' ? 'grin' : 'angry', shine: who === 'abeer', armR: who === 'abeer' ? 2.7 : .2, tilt: who === 'abeer' ? -.12 : 0, look: L(540), tag: true });
+  person({ c: 'aadi', x: 760, y: 610, t, face: who === 'aadi' ? 'smile' : 'angry', propR: 'calc', armR: who === 'aadi' ? 1.3 : .5, look: L(760), tag: true });
+  person({ c: 'chintu', x: 960, y: 610, t, face: 'chew', propR: 'samosa', armR: .9 + Math.sin(t * 5) * .15, look: L(960), tag: true });
+  person({ c: 'manit', x: 1160, y: 610, s: .95, t, face: lt > 12.2 ? 'sly' : 'smile', propR: 'chai', armR: lt > 13.2 ? 1.25 : .5, look: lt > 12.2 ? 0 : -1, tag: true });
+  bubble(lt, .3, 4, 330, 300, "I should be President! I'm the LOUDEST!", { kind: 'shout', tx: 330, ty: 420, w: 330 });
+  bubble(lt, 3.8, 7.5, 540, 290, 'Please. Look at this HAIR. That is presidential hair.', { tx: 540, ty: 400, w: 320 });
+  bubble(lt, 7.3, 10.8, 780, 290, 'I did the maths. I win by 347%.', { tx: 760, ty: 420, w: 300 });
+  bubble(lt, 10.5, 12.6, 980, 300, 'Is there lunch after this?', { tx: 960, ty: 420, w: 260 });
+  bubble(lt, 13.8, 16, 1060, 300, 'Hmm.', { kind: 'think', tx: 1150, ty: 420, w: 200 });
+  ctx.restore();
+  narr(lt, 10.2, 12.8, 'Five ministers. One chair. Zero chill.');
+  narr(lt, 13, 16, 'Manit said nothing. Manit had a plan.');
+}
+
+/* 3 — Operation: President (36–44s) */
+function s3(lt, t) {
+  blueprint(t);
+  const cards = [[220, 320, -.08, 'aryan', 'Loves attention', '→ the pond'], [490, 340, .05, 'abeer', 'Loves snacks', '→ samosas'], [760, 320, -.04, 'aadi', 'Loves maths', '→ calculator']];
+  cards.forEach(([x, y, r, who, note, fix], i) => {
+    const k = eBack(prog(lt, .3 + i * .5, .8 + i * .5));
+    if (k <= 0) return;
+    withT(x, y, () => polaroid(0, 0, r, who, note, t), k);
+    const k2 = prog(lt, 2.4 + i * .6, 2.9 + i * .6);
+    if (k2 > 0) { ctx.save(); ctx.globalAlpha = k2; text(fix, x, 490, 34, '#FFFDF6', { font: FH }); ctx.restore(); }
+  });
+  // red string
+  if (lt > 1.8) { P(); ctx.moveTo(220, 216); ctx.quadraticCurveTo(355, 270, 490, 236); ctx.quadraticCurveTo(625, 270, 760, 216); fs(null, 3, '#D2483A'); }
+  const m = track(lt, [[0, 1400, 720], [1.2, 1080, 720]]);
+  const rub = Math.sin(t * 12) * .12;
+  person({ c: 'manit', x: m.x, y: m.y, s: 1.45, t, walk: m.m ? lt * 9 : undefined, face: 'sly', armL: m.m ? undefined : 1.0 + rub, armR: m.m ? undefined : 1.0 - rub, look: -1 });
+  bubble(lt, 5, 7.8, 960, 260, 'Mwa-ha-ha. Politely.', { tx: 1060, ty: 420, w: 280 });
+  narr(lt, 3.8, 8, 'Step 1: Be nice. Step 2: Be nicer. Step 3: Be President.', { y: 600, x: 60 });
+}
+
+/* 4 — Aryan and the "Election Stage" (44–58s) */
+function s4(lt, t) {
+  pondScene(t);
+  // Aryan
+  const run = track(lt, [[5.8, 120, 600], [7.4, 420, 600], [8.2, 660, 598]]);
+  let ax = run.x, ay = run.y, arot = 0;
+  if (lt > 8.2) { const k = lt - 8.2; ax = 660 + k * 240; ay = 598 - 260 * k + 700 * k * k; arot = k * 1.8; }
+  if (lt < 9.6) {
+    ctx.save();
+    if (lt > 8.2) { P(); ctx.rect(-100, -200, W + 200, 850); ctx.clip(); }
+    person({ c: 'aryan', x: ax, y: ay, t, rot: arot, walk: run.m ? lt * 14 : undefined, face: lt > 8.2 ? 'shock' : lt > 3.6 ? 'grin' : 'smile', armL: lt > 8.2 ? 2.6 : undefined, armR: lt > 8.2 ? 2.6 : lt > 3.6 && lt < 5.8 ? 2.4 : undefined, look: 1 });
+    ctx.restore();
+  }
+  // splash
+  const sk = prog(lt, 8.75, 9.8);
+  if (sk > 0 && sk < 1) { splashDrops(800, 652, sk, 3); P(); ctx.ellipse(800, 652, 60 * eOut(sk) + 20, 16, 0, 0, TAU); fs('rgba(255,255,255,.6)', 3); }
+  bubble(lt, 8.8, 10.2, 940, 470, 'SPLASH!', { kind: 'shout', w: 200, size: 36 });
+  // Aryan comes back up, with a new friend
+  if (lt > 10) {
+    const k = eOut(prog(lt, 10, 10.9));
+    ctx.save(); P(); ctx.rect(-100, -200, W + 200, 652); ctx.clip();
+    person({ c: 'aryan', x: 810, y: lerp(900, 752, k), t, face: 'sad', wet: true, duck: true, quack: lt > 12.4 && lt < 13.8, look: -1, armL: .3, armR: .3 });
+    ctx.restore();
+    P(); ctx.ellipse(810, 652, 70 + Math.sin(t * 4) * 6, 14, 0, 0, TAU); fs(null, 3, 'rgba(255,255,255,.8)');
+  }
+  // Manit
+  const ticks = lt > 9.6 ? 1 : 0;
+  person({ c: 'manit', x: 250, y: 706, s: 1.05, t, face: lt > 8.6 ? 'sly' : 'smile', propR: lt > 9.2 ? 'clip' : 'invite', ticks, armR: lt < 3.6 ? 1.2 : .7, look: lt > 9 ? 0 : -1 });
+  bubble(lt, .3, 3.7, 330, 330, 'Aryan-ji! The TV cameras are waiting for you on the Election Stage!', { tx: 260, ty: 520, w: 400 });
+  bubble(lt, 3.6, 6, 150, 330, 'FINALLY! My audience!', { kind: 'shout', tx: 130, ty: 420, w: 260 });
+  bubble(lt, 10.9, 13, 690, 420, 'Is this… the stage?', { tx: 780, ty: 560, w: 240 });
+  bubble(lt, 12.4, 13.9, 1000, 430, 'QUACK.', { kind: 'shout', tx: 850, ty: 480, w: 160, size: 30 });
+  narr(lt, 11, 14, 'Minister #1: out. Wet, but out.');
+}
+</script>
+<script>
+/* ================= scenes, part 2 ================= */
+
+/* 5 — Abeer and the VIP Lounge (58–70s) */
+function s5(lt, t) {
+  if (lt < 6.9) {
+    const open = lt < 4.4 ? 0 : lt < 6 ? ep(lt, 4.4, 4.8) : 1 - ep(lt, 6, 6.25);
+    corridor(t, open);
+    const a = track(lt, [[4.6, 400, 660], [6.0, 830, 540]]);
+    const inDoor = prog(lt, 5.3, 6.0);
+    if (inDoor < 1) person({ c: 'abeer', x: a.x, y: a.y, s: lerp(1, .82, inDoor), alpha: 1 - inDoor, t, walk: a.m ? lt * 10 : undefined, face: lt > 3.2 ? 'grin' : 'smile', shine: lt > 3.2, look: 1, armR: lt > 3.2 && lt < 4.6 ? 2.7 : undefined });
+    person({ c: 'manit', x: 1100, y: 690, t, face: lt > 5.5 ? 'sly' : 'smile', propR: lt > 6.3 ? 'clip' : undefined, ticks: 2, armL: lt < 3.2 ? 1.4 : .3, look: lt > 5.5 ? 0 : -1 });
+    bubble(lt, .3, 3.3, 900, 270, 'Abeer, this lounge is ONLY for people with GREAT hair.', { tx: 1080, ty: 470, w: 360 });
+    bubble(lt, 3.2, 5.2, 420, 300, 'Say no more.', { tx: 420, ty: 440, w: 220 });
+    bubble(lt, 6.05, 6.9, 830, 330, 'SLAM!', { kind: 'shout', w: 180, size: 36 });
+  } else {
+    const k = lt - 6.9;
+    samosaRoom(t, Math.floor(k * 60));
+    person({ c: 'abeer', x: 440, y: 660, t, face: 'chew', propR: 'samosa', armR: 1.2 + Math.sin(t * 10) * .25, belly: Math.min(.7, k * .14), crumbs: true, shine: true, look: 1 });
+    bubble(lt, 8, 10.8, 540, 250, 'Mmm. Democracy tastes amazing.', { tx: 460, ty: 420, w: 300 });
+    narr(lt, 9, 12, 'Minister #2: busy. Very, very busy.');
+  }
+}
+
+/* 6 — Aadi and the calculator (70–82s) */
+function s6(lt, t) {
+  if (lt > 5.6 && lt < 8) {
+    // close-up of the swapped calculator
+    ctx.fillStyle = '#FFE27A'; ctx.fillRect(0, 0, W, H);
+    for (let i = 0; i < 18; i++) { const a = i / 18 * TAU + t * .3; P(); ctx.moveTo(640, 380); ctx.arc(640, 380, 1000, a, a + .1); ctx.closePath(); ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.fill(); }
+    const rev = lt >= 7;
+    withT(640 + (rev ? wob(9, 5) : 0), 380, () => {
+      box(-190, -300, 380, 560, 34, '#3B3F46', 7);
+      box(-156, -266, 312, 120, 12, '#B8D8A8', 6);
+      const disp = lt < 6.3 ? '2 + 2' : !rev ? '2 + 2 =' : 'MANIT';
+      text(disp, 136, -206, rev ? 82 : 66, '#1F3A26', { align: 'right', font: FT });
+      const keys = ['7', '8', '9', '÷', '4', '5', '6', '×', '1', '2', '3', '−', '0', '.', '=', '+'];
+      keys.forEach((kk, i) => {
+        const x = -144 + (i % 4) * 76, y = -118 + Math.floor(i / 4) * 86;
+        const pressed = (kk === '2' && lt < 6.2 && (lt * 4 % 1) < .5) || (kk === '=' && lt > 6.3 && lt < 6.7);
+        box(x, y + (pressed ? 4 : 0), 60, 68, 12, i === 14 ? '#E8743B' : '#D7D2C6', 5);
+        text(rev ? 'M' : kk, x + 30, y + 36 + (pressed ? 4 : 0), 40, INK, { font: FT });
+      });
+    });
+    narr(lt, 5.7, 7.9, "Aadi's new calculator had been… adjusted.");
+    return;
+  }
+  office(t, lt > 2.6);
+  const turned = lt > 2.8 && lt < 5;
+  person({ c: 'aadi', x: 600, y: 640, t, face: lt > 8 ? 'dizzy' : turned ? 'shock' : 'smile', look: turned ? 1 : -1, crack: lt > 8, propR: lt > 5 ? 'calc' : undefined, armR: lt > 5 ? 1.2 : .4, tilt: turned ? .12 : 0 });
+  desk(600, 720, 480);
+  withT(470, 600, () => prop('papers', t), .9);
+  if (lt < 5) withT(730, 600, () => prop('calc', t));
+  const pk = prog(lt, 3.55, 3.9);
+  if (pk > 0 && pk < 1) burst(730, 570, pk, '#FFFDF6', 10, 70);
+  const m = track(lt, [[3.2, 250, 700], [3.6, 700, 700], [4.1, 250, 700]]);
+  if (m.m) whoosh(m.x, 560, 140, lt < 3.6 ? 1 : -1);
+  person({ c: 'manit', x: m.x, y: 700, t, face: lt > 4.2 ? 'sly' : 'smile', look: lt < 3 ? 1 : 0, armR: lt < 2.8 ? 1.3 : .4, propR: lt > 8.4 ? 'clip' : undefined, ticks: 3 });
+  bubble(lt, .3, 2.9, 330, 330, 'Aadi! Is that a PIGEON wearing a CROWN?!', { tx: 260, ty: 520, w: 330 });
+  bubble(lt, 2.8, 5.2, 820, 380, '…Oh wow. It is.', { tx: 640, ty: 470, w: 230 });
+  bubble(lt, 8.1, 11, 620, 300, 'According to my calculations… the winner is MANIT?!', { tx: 600, ty: 440, w: 380 });
+  narr(lt, 9.6, 12, 'Minister #3: confused. Permanently.');
+}
+
+/* 7 — Plot twist: the ministers come back (82–96s) */
+function ballotBox(x, y, s) {
+  withT(x, y, () => {
+    box(-80, -110, 160, 110, 6, '#8A5A36', 4); box(-88, -124, 176, 18, 4, '#A87B4F', 3.5); line(-40, -115, 40, -115, 5);
+    oval(0, -54, 26, 26, '#E8C46A', 3); paw(0, -54, 14);
+  }, s);
+}
+function s7(lt, t) {
+  chamber(t);
+  const march = track(lt, [[2.8, -440, 0], [5, 0, 0]]);
+  const mv = march.m ? lt * 11 : undefined;
+  person({ c: 'aryan', x: 160 + march.x, y: 650, t, walk: mv, face: lt > 5.2 && lt < 7.6 ? 'shout' : 'angry', wet: true, duck: true, look: 1, armR: lt > 5.2 && lt < 7.6 ? 2.4 : undefined });
+  person({ c: 'abeer', x: 320 + march.x, y: 650, t, walk: mv, face: 'angry', belly: .6, crumbs: true, look: 1, armL: lt > 7.4 && lt < 9.9 ? 2.2 : undefined });
+  person({ c: 'aadi', x: 480 + march.x, y: 650, t, walk: mv, face: lt < 5 ? 'dizzy' : 'angry', crack: true, look: 1 });
+  person({ c: 'bholu', x: 980, y: 640, t, face: lt < 7.8 ? 'sleep' : 'shock', tilt: lt < 7.8 ? .15 : 0, look: -1 });
+  if (lt < 7.8) zzz(1000, 450, t);
+  person({ c: 'chintu', x: 1150, y: 640, t, face: lt > 2.8 && lt < 5 ? 'shock' : 'chew', propR: 'samosa', armR: .9, look: -1 });
+  const calm = lt > 9.9;
+  person({ c: 'manit', x: 740, y: 640, t, face: lt < 2.8 ? 'happy' : calm ? 'smile' : 'shock', look: -1, armL: lt < 2.8 ? 2.4 : undefined, armR: lt < 2.8 ? 2.4 : undefined });
+  const bk = eBack(prog(lt, 11, 11.5));
+  if (bk > 0) ballotBox(640, 710, bk);
+  const from = [160, 320, 480, 740, 980, 1150];
+  from.forEach((x, i) => {
+    const k = prog(lt, 11.5 + i * .35, 12.2 + i * .35);
+    if (k <= 0 || k >= 1) return;
+    withT(lerp(x, 640, k), lerp(430, 600, k) - Math.sin(k * PI) * 160, () => prop('ballot', t), 1.1, 1.1, k * 8);
+  });
+  bubble(lt, .3, 2.9, 760, 300, "Looks like I'm the only candidate left!", { tx: 740, ty: 440, w: 330 });
+  bubble(lt, 2.8, 4.4, 230, 290, 'WAIT!!!', { kind: 'shout', w: 200, size: 40 });
+  bubble(lt, 5.2, 7.6, 220, 300, 'Manit TRICKED us!', { kind: 'shout', tx: 160, ty: 440, w: 260 });
+  bubble(lt, 7.4, 9.9, 380, 290, 'We demand a REAL vote!', { tx: 320, ty: 440, w: 280 });
+  bubble(lt, 8, 10, 1000, 300, 'Huh? A vote? I vote for me.', { tx: 980, ty: 430, w: 280 });
+  bubble(lt, 9.9, 12, 780, 300, 'Of course. Let us vote.', { tx: 740, ty: 440, w: 260 });
+  narr(lt, 2.9, 5.6, 'PLOT TWIST: the ministers figured it out.');
+  narr(lt, 10.2, 14, 'Manit agreed instantly. A little too instantly.');
+}
+
+/* 8 — The count, and the Royal Cat (96–110s) */
+function s8(lt, t) {
+  chamber(t);
+  const names = ['ARYAN', 'ABEER', 'AADI', 'MANIT', 'BHOLU', 'CHINTU'];
+  box(250, 18, 780, 176, 10, '#22352C', 5); box(262, 30, 756, 152, 6, null, 2);
+  text('THE COUNT', 640, 56, 30, '#E8C46A', { font: FT });
+  names.forEach((n, i) => {
+    const x = 315 + i * 130, win = n === 'MANIT' && lt > 10.4;
+    if (win) box(x - 58, 76, 116, 100, 8, '#E8B33C', 3);
+    text(n, x, 96, 22, win ? INK : '#F3EAD6');
+    const v = (lt > .2 + i * .25 ? 1 : 0) + (win ? 1 : 0);
+    text(v ? 'I'.repeat(v) : '–', x, 142, 44, win ? INK : '#FFFDF6', { font: FT });
+  });
+  const tie = lt > 1.9 && lt < 3.8, stun = lt > 10.2 && lt < 12.5;
+  const cast = [['aryan', 150], ['abeer', 310], ['aadi', 470], ['manit', 760], ['bholu', 960], ['chintu', 1130]];
+  const c = track(lt, [[5.8, -160, 690], [7, 250, 690], [7.9, 250, 690], [9.4, 640, 690]]);
+  cast.forEach(([k, x]) => {
+    const isM = k === 'manit';
+    const look = clamp((c.x - x) / 200, -1, 1);
+    person({
+      c: k, x, y: 640, t, look: lt > 5.8 ? look : 0,
+      face: tie || (stun && !isM) ? 'shock' : isM ? (lt > 9 ? 'sly' : 'smile') : k === 'abeer' && lt > 6.8 && lt < 8 ? 'grin' : 'smile',
+      wet: k === 'aryan', duck: k === 'aryan', quack: k === 'aryan' && lt > 6 && lt < 6.8,
+      belly: k === 'abeer' ? .6 : 0, crack: k === 'aadi',
+      propR: isM && lt > 9 ? 'fish' : k === 'aadi' && lt > 3.5 && lt < 6 ? 'papers' : undefined,
+      armR: isM && lt > 9 ? .5 : k === 'aadi' && lt > 3.5 && lt < 6 ? 1.3 : undefined,
+    });
+  });
+  // Churi walks in
+  if (lt > 5.8) {
+    const sitting = lt > 9.4;
+    cat({ x: c.x, y: c.y + 20, s: 1, t, pose: sitting ? 'sit' : 'walk', walk: c.m ? lt * 9 : 0, face: sitting ? 'smug' : 'open', meow: lt > 10 && lt < 11.4 ? 1 : 0 });
+    if (lt < 10.6) {
+      const a = prog(lt, 5.6, 6.2) * (1 - prog(lt, 10.2, 10.6)) * .55;
+      ctx.save(); ctx.fillStyle = `rgba(10,8,20,${a})`; P(); ctx.rect(-100, -100, W + 200, H + 200);
+      ctx.arc(c.x + (sitting ? 0 : 30), c.y - 70, 170, 0, TAU, true); ctx.fill('evenodd'); ctx.restore();
+    }
+  }
+  bubble(lt, 1.9, 3.8, 640, 300, "IT'S A TIE!", { kind: 'shout', w: 280, size: 44 });
+  bubble(lt, 3.6, 6, 520, 290, 'Rule 42! In a tie… the ROYAL CAT decides!', { tx: 470, ty: 440, w: 340 });
+  bubble(lt, 6.8, 8, 380, 330, 'Psst… samosa?', { tx: 310, ty: 450, w: 220 });
+  bubble(lt, 10, 11.6, 560, 420, 'MEOW.', { kind: 'shout', tx: 640, ty: 590, w: 170, size: 36 });
+  narr(lt, 10.8, 14, 'Manit had been feeding the Royal Cat. Every day. For eleven years.', { y: 214 });
+}
+
+/* 9 — Sworn in at Manit Bhavan (110–119s) */
+function fountain(x, y, t) {
+  P(); ctx.ellipse(x, y, 90, 22, 0, 0, TAU); fs('#DCE7EE', 4);
+  P(); ctx.ellipse(x, y - 4, 74, 14, 0, 0, TAU); fs('#6FBCE0', 0);
+  for (let i = -2; i <= 2; i++) { P(); ctx.moveTo(x, y - 60); ctx.quadraticCurveTo(x + i * 26, y - 100 - Math.sin(t * 5 + i) * 6, x + i * 32, y - 8); fs(null, 4, 'rgba(160,215,240,.9)'); }
+  box(x - 8, y - 62, 16, 56, 3, '#DCE7EE', 3);
+}
+function s9(lt, t) {
+  const n = ep(lt, 0, 6.5);
+  sky(mixC('#F6A76A', '#1B2548', n), mixC('#FFE0A8', '#5B4A7A', n), 560);
+  ctx.save(); ctx.globalAlpha = n; for (let i = 0; i < 40; i++) oval(hash(i) * W, hash(i + 70) * 300, 1.8, 1.8, '#FFF6D8', 0); ctx.restore();
+  hills(520, mixC('#8CC263', '#2E4A3A', n), 20, 2);
+  presHouse(640, 562, .78, t);
+  ground(556, mixC(GRASS, '#35553F', n));
+  poly([604, 560, 676, 560, 830, 730, 450, 730], '#B23A3A', 4);
+  fountain(200, 610, t); fountain(1080, 610, t);
+  const cols = ['#FFE27A', '#F28DB2', '#8FD3F0', '#B6D96A', '#FFFDF6'];
+  if (lt > 2.6) for (let i = 0; i < 9; i++) {
+    const per = 1.7, ph = (lt - 2.6 + i * .37) % per / per, cyc = Math.floor((lt - 2.6 + i * .37) / per);
+    const x = 140 + hash(i * 5 + cyc) * 1000, y = 70 + hash(i * 3 + cyc + 9) * 200;
+    if (ph < .2) { line(x, 560 - ph * 5 * (560 - y), x, 580 - ph * 5 * (560 - y), 3, '#FFE9A0'); }
+    else burst(x, y, (ph - .2) / .8, cols[i % 5], 18, 110);
+  }
+  const who = [['abeer', 190, 'Samosas'], ['aryan', 380, 'Ponds'], ['aadi', 900, 'Calculators'], ['bholu', 1060, 'Naps'], ['chintu', 1210, 'Lunch']];
+  who.forEach(([k, x, job], i) => {
+    person({ c: k, x, y: 700, s: .88, t, face: k === 'bholu' ? 'sleep' : 'happy', wet: k === 'aryan', duck: k === 'aryan', belly: k === 'abeer' ? .6 : 0, crack: k === 'aadi', armR: lt > 4.8 ? 2.9 : undefined });
+    const pk = eBack(prog(lt, 4.8 + i * .25, 5.3 + i * .25));
+    if (pk > 0) withT(x + 42, 470, () => { line(0, 20, 0, 70, 5, '#8A5A36'); box(-72, -30, 144, 56, 6, '#FFFDF6', 3.5); text('Minister of', 0, -14, 17, INK); text(job, 0, 9, 24, '#C8553D'); }, pk);
+  });
+  const cheer = lt > 2.4;
+  person({ c: 'manit', x: 640, y: 690, s: 1.05, t, face: 'happy', sash: true, armL: cheer ? 2.6 + Math.sin(t * 6) * .15 : .2, armR: cheer ? 2.6 - Math.sin(t * 6) * .15 : .2, bob: cheer ? -Math.abs(Math.sin(t * 6)) * 8 : 0 });
+  crowd(790, 16, t, cheer ? 1 : 0);
+  narr(lt, .3, 4.6, 'President Manit Khatri was sworn in at Manit Bhavan, the Presidential House.');
+  narr(lt, 4.8, 9, 'And everybody got a brand-new job.');
+}
+
+/* 10 — Who really rules Manit Land (119–130s) */
+function s10(lt, t) {
+  presOffice(t);
+  bigChair(880, 640, 1);
+  const stamp = lt > 4.3;
+  cat({ x: 880, y: 532, s: 1.05, t, face: lt > 7.4 ? 'smug' : 'open', crown: true, meow: lt > 4.8 && lt < 6.4 ? 1 : 0 });
+  desk(880, 760, 540);
+  withT(840, 632, () => {
+    box(-60, -12, 150, 24, 2, '#FFFDF6', 3);
+  });
+  if (stamp) { const k = eBack(prog(lt, 4.3, 4.6)); withT(870, 628, () => { ctx.globalAlpha = .9; text('APPROVED', 0, 0, 20, '#C8553D', { font: FT }); paw(62, 0, 9, '#C8553D'); }, k, k, -.12); }
+  const m = track(lt, [[0, -120, 720], [2.2, 420, 720]]);
+  person({ c: 'manit', x: m.x, y: m.y, s: 1.05, t, walk: m.m ? lt * 9 : undefined, face: lt > 7.4 ? 'happy' : 'smile', sash: true, propR: 'tray', armR: .9, look: 1, rot: lt > 5.6 && lt < 8 ? ep(lt, 5.6, 6) * .22 * (1 - ep(lt, 7.4, 8)) : 0 });
+  bubble(lt, 1.8, 4.4, 480, 330, 'Your tea, Madam President.', { tx: 430, ty: 520, w: 300 });
+  bubble(lt, 4.8, 6.6, 1080, 290, 'Meow.', { tx: 920, ty: 430, w: 150 });
+  narr(lt, 5.2, 8.6, 'Manit rules Manit Land. But everyone knows who rules Manit.');
+  // iris out on the cat's wink, then the end card
+  const r = lt < 8.2 ? 0 : lt < 9 ? lerp(900, 90, ep(lt, 8.2, 9)) : lt < 9.5 ? 90 : lerp(90, 0, ep(lt, 9.5, 9.8));
+  if (lt > 8.2) { ctx.fillStyle = '#0B0A0E'; P(); ctx.rect(-100, -100, W + 200, H + 200); if (r > 0) ctx.arc(880, 425, r, 0, TAU, true); ctx.fill('evenodd'); }
+  if (lt > 9.8) {
+    const k = eBack(prog(lt, 9.8, 10.3));
+    for (let i = 0; i < 7; i++) paw(180 + i * 150, 600 + (i % 2) * 30, 18, 'rgba(232,196,106,.35)');
+    withT(640, 300, () => text('THE END', 0, 0, 120, '#FFE27A', { font: FT, stroke: 12 }), k);
+    ctx.save(); ctx.globalAlpha = prog(lt, 10, 10.4);
+    text('Long live President Manit. Longer live Churi.', 640, 420, 34, '#F3EAD6');
+    ctx.restore();
+  }
+}
+</script>
+<script>
+/* ================= the projector: timeline, sound, controls ================= */
+const SCENES = [
+  { t0: 0, t1: 9, name: 'Manit Land', fn: s0 },
+  { t0: 9, t1: 20, name: 'The Grand Parliament', fn: s1 },
+  { t0: 20, t1: 36, name: 'Everyone wants the chair', fn: s2 },
+  { t0: 36, t1: 44, name: 'Operation: President', fn: s3 },
+  { t0: 44, t1: 58, name: 'Aryan takes the stage', fn: s4 },
+  { t0: 58, t1: 70, name: 'Abeer and the samosas', fn: s5 },
+  { t0: 70, t1: 82, name: 'Aadi does the maths', fn: s6 },
+  { t0: 82, t1: 96, name: 'Plot twist', fn: s7 },
+  { t0: 96, t1: 110, name: 'The Royal Cat decides', fn: s8 },
+  { t0: 110, t1: 119, name: 'Sworn in at Manit Bhavan', fn: s9 },
+  { t0: 119, t1: 130, name: 'Who really rules', fn: s10 },
+];
+const sceneAt = time => SCENES.find(s => time < s.t1) || SCENES[SCENES.length - 1];
+
+function render(time) {
+  BOIL = Math.floor(time * 8);
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = '#0B0A0E'; ctx.fillRect(0, 0, cv.width, cv.height);
+  ctx.setTransform(K, 0, 0, K, 0, 0);
+  const sc = sceneAt(time), lt = time - sc.t0, dur = sc.t1 - sc.t0;
+  ctx.save(); P(); ctx.rect(0, 0, W, H); ctx.clip();
+  try { sc.fn(lt, time); } catch (e) { console.error(e); }
+  ctx.restore();
+  // cartoon iris between scenes
+  let r = null;
+  if (sc !== SCENES[0] && lt < .5) r = lerp(0, 820, eOut(lt / .5));
+  if (sc !== SCENES[SCENES.length - 1] && lt > dur - .5) r = lerp(820, 0, ease((lt - (dur - .5)) / .5));
+  if (r !== null) { ctx.fillStyle = '#0B0A0E'; P(); ctx.rect(-10, -10, W + 20, H + 20); ctx.arc(640, 360, Math.max(r, .1), 0, TAU, true); ctx.fill('evenodd'); }
+  const g = ctx.createRadialGradient(640, 360, 380, 640, 360, 820);
+  g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(40,20,10,.28)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+}
+
+/* ---------- sound: a little brass-band loop + cartoon effects ---------- */
+let AC = null, master = null, soundOn = true;
+function initAudio() {
+  if (AC) return;
+  try { AC = new (window.AudioContext || window.webkitAudioContext)(); master = AC.createGain(); master.gain.value = soundOn ? .55 : 0; master.connect(AC.destination); } catch (e) { AC = null; }
+}
+const midi = m => 440 * Math.pow(2, (m - 69) / 12);
+function tone(f, at, dur, type = 'triangle', vol = .12, glide) {
+  const o = AC.createOscillator(), g = AC.createGain();
+  o.type = type; o.frequency.setValueAtTime(f, at);
+  if (glide) o.frequency.exponentialRampToValueAtTime(glide, at + dur);
+  g.gain.setValueAtTime(.0001, at); g.gain.exponentialRampToValueAtTime(vol, at + .012); g.gain.exponentialRampToValueAtTime(.0001, at + dur);
+  o.connect(g); g.connect(master); o.start(at); o.stop(at + dur + .05);
+}
+let NB = null;
+function noise(at, dur, vol = .2, freq = 1200, q = .8, sweep) {
+  if (!NB) { NB = AC.createBuffer(1, AC.sampleRate, AC.sampleRate); const d = NB.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+  const s = AC.createBufferSource(), f = AC.createBiquadFilter(), g = AC.createGain();
+  s.buffer = NB; f.type = 'bandpass'; f.frequency.setValueAtTime(freq, at); f.Q.value = q;
+  if (sweep) f.frequency.exponentialRampToValueAtTime(sweep, at + dur);
+  g.gain.setValueAtTime(vol, at); g.gain.exponentialRampToValueAtTime(.0001, at + dur);
+  s.connect(f); f.connect(g); g.connect(master); s.start(at); s.stop(at + dur + .05);
+}
+const meow = (at, v = .14) => { tone(560, at, .16, 'sawtooth', v * .6, 900); tone(900, at + .15, .38, 'triangle', v, 480); };
+const quack = at => { tone(420, at, .12, 'sawtooth', .08, 300); tone(400, at + .16, .12, 'sawtooth', .08, 280); };
+const chord = (at, notes, dur = .9, vol = .07) => notes.forEach(n => tone(midi(n), at, dur, 'triangle', vol));
+
+const SFX = [
+  [1.9, a => chord(a, [60, 64, 67, 72], 1.2)],
+  [52.75, a => { noise(a, .7, .45, 700, .6, 200); tone(180, a, .3, 'sine', .15, 60); }],
+  [56.4, quack], [57.2, quack],
+  [64.05, a => { noise(a, .18, .6, 260, .7); tone(70, a, .25, 'sine', .3, 40); }],
+  [73.5, a => noise(a, .35, .3, 400, 1.2, 3000)],
+  [77, a => { tone(1318, a, .25, 'square', .05); tone(1568, a + .14, .5, 'square', .05); }],
+  [84.8, a => { noise(a, .2, .5, 300, .6); chord(a, [48, 54, 60], .5, .09); }],
+  ...[0, 1, 2, 3, 4, 5].map(i => [94.2 + i * .35, a => tone(880 + i * 60, a, .08, 'square', .04)]),
+  [97.9, a => { tone(110, a, 1.4, 'square', .06, 105); tone(165, a, 1.4, 'triangle', .06); }],
+  ...Array.from({ length: 70 }, (_, i) => [101.8 + i * .06, a => noise(a, .05, .08 + i * .002, 180, .9)]),
+  [106, a => meow(a, .16)],
+  [110.1, a => chord(a, [60, 64, 67, 72, 76], 1.6, .07)],
+  ...Array.from({ length: 12 }, (_, i) => [112.9 + i * .52, a => noise(a, .3, .22, 900 + (i % 3) * 400, .5, 200)]),
+  [123.3, a => { noise(a, .12, .5, 220, .8); tone(90, a, .15, 'sine', .25, 50); }],
+  [123.8, a => meow(a, .12)],
+  [128.9, a => chord(a, [53, 57, 60, 65], 1.8, .07)],
+];
+
+const STEP = 60 / 112 / 2; // eighth notes at 112 bpm
+const MEL = {
+  main: [72, null, 76, 79, 76, null, 74, 77, 72, null, 76, 79, 84, 83, 79, null],
+  sneaky: [60, null, 63, null, 67, null, 66, null, 65, null, 63, null, 62, null, 59, null],
+  fanfare: [72, 72, 72, 77, null, 76, 77, 79, 81, null, 79, 77, 76, 77, 79, 84],
+  tension: [],
+};
+const BASS = [48, 53, 55, 48];
+function moodAt(x) { return x < 36 ? 'main' : x < 44 ? 'sneaky' : x < 70 ? 'main' : x < 82 ? 'sneaky' : x < 96 ? 'main' : x < 106.4 ? 'tension' : x < 110 ? 'main' : x < 119 ? 'fanfare' : x < 128.6 ? 'main' : 'none'; }
+let nextStep = 0;
+function audioTick(prevT, nowT) {
+  if (!AC || !soundOn) return;
+  const base = AC.currentTime;
+  for (const [et, fn] of SFX) if (et > prevT && et <= nowT) fn(base + .01);
+  while (nextStep * STEP < nowT + .12) {
+    const st = nextStep * STEP, at = base + Math.max(0, st - nowT);
+    const mood = moodAt(st), i = nextStep % 16;
+    if (st >= nowT - .05 && mood !== 'none' && mood !== 'tension') {
+      const n = MEL[mood][i];
+      const soft = st > 119 ? .6 : 1;
+      if (n) tone(midi(n), at, mood === 'sneaky' ? .12 : .22, mood === 'sneaky' ? 'square' : 'triangle', (mood === 'sneaky' ? .035 : .06) * soft);
+      if (i % 2 === 0) tone(midi(BASS[Math.floor(nextStep / 8) % 4] - (mood === 'sneaky' ? 12 : 0)), at, .2, 'sine', .11 * soft);
+      if (i % 4 === 2 && mood !== 'sneaky') noise(at, .05, .05 * soft, 6000, .7);
+    }
+    nextStep++;
+  }
+}
+function resyncAudio() { nextStep = Math.ceil(T / STEP); }
+
+/* ---------- playback + controls ---------- */
+let T = 0, playing = false, lastNow = 0, dirty = true, started = false;
+const $ = id => document.getElementById(id);
+const fmt = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+const POSTER = 5.2;
+
+function setPlaying(p) {
+  playing = p;
+  $('playIcon').setAttribute('d', p ? 'M6 4h4v16H6zM14 4h4v16h-4z' : 'M7 4l13 8-13 8z');
+  $('play').setAttribute('aria-label', p ? 'Pause' : 'Play');
+  if (p) { started = true; $('bigPlay').hidden = true; initAudio(); if (AC && AC.state === 'suspended') AC.resume(); resyncAudio(); }
+  dirty = true;
+}
+function toggle() { if (!playing && T >= DUR - .01) seek(0); setPlaying(!playing); }
+function seek(x) { T = clamp(x, 0, DUR); started = true; $('bigPlay').hidden = true; resyncAudio(); dirty = true; }
+
+function frame(now) {
+  const dt = Math.min(.1, (now - lastNow) / 1000 || 0); lastNow = now;
+  if (playing) {
+    const prev = T; T = Math.min(DUR, T + dt);
+    audioTick(prev, T);
+    if (T >= DUR) setPlaying(false);
+    dirty = true;
+  }
+  if (dirty) { render(started ? T : POSTER); updateUI(); dirty = false; }
+  requestAnimationFrame(frame);
+}
+
+const chapList = $('chapters');
+SCENES.forEach((s, i) => {
+  const li = document.createElement('li'), b = document.createElement('button');
+  b.className = 'chap'; b.id = 'chap' + i;
+  b.innerHTML = `<b>${String(i + 1).padStart(2, '0')}</b><span></span><small>${fmt(s.t0)}</small>`;
+  b.querySelector('span').textContent = s.name;
+  b.addEventListener('click', () => { seek(s.t0 + .01); if (!playing) setPlaying(true); });
+  li.appendChild(b); chapList.appendChild(li);
+  if (i) { const tk = document.createElement('i'); tk.style.left = (s.t0 / DUR * 100) + '%'; $('ticks').appendChild(tk); }
+});
+let lastChap = -1;
+function updateUI() {
+  $('time').textContent = `${fmt(T)} / ${fmt(DUR)}`;
+  if (document.activeElement !== $('seek')) $('seek').value = T;
+  const ci = SCENES.indexOf(sceneAt(T));
+  if (ci !== lastChap) { if (lastChap >= 0) $('chap' + lastChap).classList.remove('on'); $('chap' + ci).classList.add('on'); lastChap = ci; }
+}
+
+$('seek').max = DUR;
+$('seek').addEventListener('input', e => seek(+e.target.value));
+$('play').addEventListener('click', toggle);
+$('bigPlay').addEventListener('click', () => { seek(0); setPlaying(true); });
+cv.addEventListener('click', toggle);
+$('restart').addEventListener('click', () => { seek(0); setPlaying(true); });
+$('sound').addEventListener('click', () => {
+  soundOn = !soundOn;
+  $('sound').setAttribute('aria-pressed', soundOn);
+  $('sound').querySelector('.lbl').textContent = soundOn ? 'Sound on' : 'Sound off';
+  $('waves').style.opacity = soundOn ? 1 : .15;
+  if (master) master.gain.value = soundOn ? .55 : 0;
+  resyncAudio();
+});
+document.addEventListener('keydown', e => {
+  const tag = e.target.tagName;
+  if (e.key === ' ' && tag !== 'BUTTON' && tag !== 'INPUT') { e.preventDefault(); toggle(); }
+  if (tag === 'INPUT') return;
+  if (e.key === 'ArrowRight') seek(T + 5);
+  if (e.key === 'ArrowLeft') seek(T - 5);
+});
+
+resize();
+new ResizeObserver(() => { resize(); dirty = true; }).observe($('stage'));
+if (document.fonts) Promise.all([document.fonts.load(`40px ${FT}`), document.fonts.load(`28px ${FH}`)]).catch(() => {}).finally(() => { dirty = true; });
+requestAnimationFrame(frame);
+</script>
